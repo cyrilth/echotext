@@ -21,6 +21,7 @@ public class ModelManager : IModelManager
     private static readonly SemaphoreSlim _downloadLock = new(1, 1);
     private static string? _currentlyDownloading;
     private readonly ILogger<ModelManager> _logger;
+    private readonly string _modelsDirectory;
 
     private static readonly Dictionary<string, ModelInfo> _modelDefinitions = new()
     {
@@ -51,10 +52,11 @@ public class ModelManager : IModelManager
             "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3.bin")
     };
 
-    public ModelManager(ILogger<ModelManager> logger)
+    public ModelManager(ILogger<ModelManager> logger, string? modelsDirectory = null)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _logger.LogInformation("ModelManager initialized");
+        _modelsDirectory = modelsDirectory ?? PlatformInfo.ModelsDirectory;
+        _logger.LogInformation("ModelManager initialized with models directory: {ModelsDirectory}", _modelsDirectory);
     }
 
     /// <summary>
@@ -246,16 +248,16 @@ public class ModelManager : IModelManager
         return Task.CompletedTask;
     }
 
-    private static string GetModelFilePath(string modelName)
+    private string GetModelFilePath(string modelName)
     {
-        return Path.Combine(PlatformInfo.ModelsDirectory, $"ggml-{modelName}.bin");
+        return Path.Combine(_modelsDirectory, $"ggml-{modelName}.bin");
     }
 
-    private static void EnsureModelsDirectoryExists()
+    private void EnsureModelsDirectoryExists()
     {
-        if (!Directory.Exists(PlatformInfo.ModelsDirectory))
+        if (!Directory.Exists(_modelsDirectory))
         {
-            Directory.CreateDirectory(PlatformInfo.ModelsDirectory);
+            Directory.CreateDirectory(_modelsDirectory);
         }
     }
 

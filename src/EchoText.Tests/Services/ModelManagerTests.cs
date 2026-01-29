@@ -20,11 +20,13 @@ public class ModelManagerTests : IDisposable
     public ModelManagerTests()
     {
         _mockLogger = new Mock<ILogger<ModelManager>>();
-        _modelManager = new ModelManager(_mockLogger.Object);
 
         // Use a test-specific models directory
         _testModelsDirectory = Path.Combine(Path.GetTempPath(), "EchoTextTests", Guid.NewGuid().ToString());
         Directory.CreateDirectory(_testModelsDirectory);
+
+        // Pass the test directory to ModelManager for isolation
+        _modelManager = new ModelManager(_mockLogger.Object, _testModelsDirectory);
     }
 
     public void Dispose()

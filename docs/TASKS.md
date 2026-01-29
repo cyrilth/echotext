@@ -873,7 +873,7 @@ Add structured logging throughout the application.
 | **ID** | TASK-701 |
 | **Complexity** | 🟡 Medium |
 | **Dependencies** | TASK-603 |
-| **Status** | ⬜ Not Started |
+| **Status** | ✅ Complete |
 
 **Description:**
 Set up continuous integration workflow.
@@ -888,11 +888,11 @@ Set up continuous integration workflow.
 - Report results
 
 **Acceptance Criteria:**
-- [ ] Builds on Windows runner
-- [ ] Builds on Ubuntu runner
-- [ ] Builds on macOS runner
-- [ ] Tests run and report results
-- [ ] Build fails if tests fail
+- [x] Builds on Windows runner
+- [x] Builds on Ubuntu runner
+- [x] Builds on macOS runner
+- [x] Tests run and report results
+- [x] Build fails if tests fail
 
 ---
 
@@ -1058,18 +1058,20 @@ For a single developer or AI agent, here's the recommended order:
 
 ### Sprint 4: UI & Integration
 18. ✅ TASK-501: Create Tray Icon & Context Menu
-19. ⬜ TASK-502: Create Settings Window
-20. ⬜ TASK-504: Implement Main Orchestration Logic
-21. ⬜ TASK-601: Implement First-Run Experience
+19. ✅ TASK-502: Create Settings Window
+20. ✅ TASK-503: Create Recording Overlay
+21. ✅ TASK-504: Implement Main Orchestration Logic
 
 ### Sprint 5: Other Platforms
 22. ✅ TASK-302/303/304: Implement remaining platform providers
 
-### Sprint 6: Polish & Release
-23. ⬜ TASK-503: Create Recording Overlay (Optional)
-24. ⬜ TASK-602: Implement Update Checker
-25. ⬜ TASK-603: Write Unit Tests
-26. ⬜ TASK-604: Add Logging
+### Sprint 6: Polish & Testing
+23. ✅ TASK-601: Implement First-Run Experience
+24. ✅ TASK-602: Implement Update Checker
+25. ✅ TASK-603: Write Unit Tests
+26. ✅ TASK-604: Add Logging
+
+### Sprint 7: Build & Distribution
 27. ⬜ TASK-701: Create GitHub Actions CI
 28. ⬜ TASK-702: Create GitHub Actions Release
 29. ⬜ TASK-703: Create README

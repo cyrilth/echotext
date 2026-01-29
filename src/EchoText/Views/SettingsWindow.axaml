@@ -88,10 +88,18 @@
                                          IsReadOnly="True"
                                          Watermark="Click Change to set hotkey"/>
                                 <Button Grid.Column="1"
-                                        Content="Change"
                                         Command="{Binding ChangeHotkeyCommand}"
-                                        Margin="5,0,0,0"/>
+                                        Margin="5,0,0,0">
+                                    <Panel>
+                                        <TextBlock Text="Change" IsVisible="{Binding !IsCapturingHotkey}"/>
+                                        <TextBlock Text="Cancel" IsVisible="{Binding IsCapturingHotkey}"/>
+                                    </Panel>
+                                </Button>
                             </Grid>
+                            <TextBlock Text="Press any key combination (Escape to cancel)"
+                                       FontStyle="Italic"
+                                       Foreground="Orange"
+                                       IsVisible="{Binding IsCapturingHotkey}"/>
                         </StackPanel>
                     </StackPanel>
                 </Border>

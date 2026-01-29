@@ -26,6 +26,7 @@ public partial class MainViewModel : ViewModelBase
     private readonly IModelManager _modelManager;
     private readonly IUpdateService _updateService;
     private readonly ILogger<MainViewModel> _logger;
+    private string? _loadedModelName;
 
     [ObservableProperty]
     private string _statusText = "Idle";
@@ -80,6 +81,9 @@ public partial class MainViewModel : ViewModelBase
         // Subscribe to hotkey events
         _hotkeyService.HotkeyPressed += OnHotkeyPressed;
         _hotkeyService.HotkeyReleased += OnHotkeyReleased;
+
+        // Subscribe to settings changes to reload model if needed
+        _configService.SettingsChanged += OnSettingsChanged;
 
         // Initialize status based on current state
         UpdateStatusForState(_appStateManager.CurrentState);
@@ -230,24 +234,7 @@ public partial class MainViewModel : ViewModelBase
             }
 
             // Load the model if one is available
-            var modelPath = _modelManager.GetModelPath(_configService.Settings.Recognition.ModelName);
-            if (!string.IsNullOrEmpty(modelPath))
-            {
-                _logger.LogInformation("Loading Whisper model: {ModelName}", _configService.Settings.Recognition.ModelName);
-                var loadResult = await _transcriptionService.LoadModelAsync(modelPath);
-                if (!loadResult.IsSuccess)
-                {
-                    _logger.LogError("Failed to load Whisper model: {Error}", loadResult.Error);
-                    await _notificationService.ShowNotificationAsync(
-                        "Model Load Failed",
-                        $"Failed to load model: {loadResult.Error}",
-                        NotificationType.Error);
-                }
-            }
-            else
-            {
-                _logger.LogWarning("No model available to load");
-            }
+            await LoadModelIfNeededAsync();
 
             // Register hotkey
             _logger.LogInformation("Registering global hotkey");
@@ -480,6 +467,56 @@ public partial class MainViewModel : ViewModelBase
     }
 
     /// <summary>
+    /// Handles settings changes to reload model if needed
+    /// </summary>
+    private async void OnSettingsChanged(object? sender, EventArgs e)
+    {
+        var configuredModel = _configService.Settings.Recognition.ModelName;
+
+        // Check if the model changed
+        if (_loadedModelName != configuredModel)
+        {
+            _logger.LogInformation("Model changed from {OldModel} to {NewModel}, reloading...",
+                _loadedModelName ?? "(none)", configuredModel);
+            await LoadModelIfNeededAsync();
+        }
+    }
+
+    /// <summary>
+    /// Loads the configured model if it's available and different from the currently loaded one
+    /// </summary>
+    private async Task LoadModelIfNeededAsync()
+    {
+        var configuredModel = _configService.Settings.Recognition.ModelName;
+        var modelPath = _modelManager.GetModelPath(configuredModel);
+
+        if (!string.IsNullOrEmpty(modelPath))
+        {
+            _logger.LogInformation("Loading Whisper model: {ModelName}", configuredModel);
+            var loadResult = await _transcriptionService.LoadModelAsync(modelPath);
+            if (loadResult.IsSuccess)
+            {
+                _loadedModelName = configuredModel;
+                _logger.LogInformation("Model {ModelName} loaded successfully", configuredModel);
+            }
+            else
+            {
+                _logger.LogError("Failed to load Whisper model: {Error}", loadResult.Error);
+                _loadedModelName = null;
+                await _notificationService.ShowNotificationAsync(
+                    "Model Load Failed",
+                    $"Failed to load model: {loadResult.Error}",
+                    NotificationType.Error);
+            }
+        }
+        else
+        {
+            _logger.LogWarning("No model available to load for {ModelName}", configuredModel);
+            _loadedModelName = null;
+        }
+    }
+
+    /// <summary>
     /// Updates the status text and tray icon based on the current app state
     /// </summary>
     private void UpdateStatusForState(AppState state)
@@ -529,6 +566,7 @@ public partial class MainViewModel : ViewModelBase
             _appStateManager.StateChanged -= OnAppStateChanged;
             _hotkeyService.HotkeyPressed -= OnHotkeyPressed;
             _hotkeyService.HotkeyReleased -= OnHotkeyReleased;
+            _configService.SettingsChanged -= OnSettingsChanged;
         }
         base.Dispose(disposing);
     }

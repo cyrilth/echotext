@@ -45,6 +45,9 @@ public partial class SettingsViewModel : ViewModelBase
     [ObservableProperty]
     private string _hotkeyDisplay = "Ctrl+Shift+Space";
 
+    [ObservableProperty]
+    private bool _isCapturingHotkey;
+
     // Output Settings
     [ObservableProperty]
     private bool _copyToClipboard = true;
@@ -60,6 +63,7 @@ public partial class SettingsViewModel : ViewModelBase
     private ObservableCollection<WhisperModel> _availableModels = new();
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(DownloadModelCommand))]
     private WhisperModel? _selectedModel;
 
     [ObservableProperty]
@@ -72,6 +76,8 @@ public partial class SettingsViewModel : ViewModelBase
     private bool _isLoadingModels;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(DownloadModelCommand))]
+    [NotifyCanExecuteChangedFor(nameof(CancelDownloadCommand))]
     private bool _isDownloadingModel;
 
     [ObservableProperty]
@@ -509,13 +515,57 @@ public partial class SettingsViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// Command to change hotkey
+    /// Command to change hotkey - toggles capture mode
     /// </summary>
     [RelayCommand]
     private void ChangeHotkey()
     {
-        // TODO: Implement hotkey picker dialog
-        // For now, this is a placeholder
+        IsCapturingHotkey = !IsCapturingHotkey;
+        if (IsCapturingHotkey)
+        {
+            HotkeyDisplay = "Press a key combination...";
+        }
+        else
+        {
+            UpdateHotkeyDisplay();
+        }
+    }
+
+    /// <summary>
+    /// Called from the view when a key is pressed during hotkey capture
+    /// </summary>
+    public void CaptureHotkey(KeyModifiers modifiers, string key)
+    {
+        if (!IsCapturingHotkey)
+            return;
+
+        // Require at least one modifier
+        if (modifiers == KeyModifiers.None)
+        {
+            HotkeyDisplay = "Please include a modifier (Ctrl, Shift, Alt)";
+            return;
+        }
+
+        // Update working settings
+        _workingSettings.Hotkey.Modifiers = modifiers;
+        _workingSettings.Hotkey.Key = key;
+        HasUnsavedChanges = true;
+
+        // Exit capture mode and update display
+        IsCapturingHotkey = false;
+        UpdateHotkeyDisplay();
+    }
+
+    /// <summary>
+    /// Cancel hotkey capture
+    /// </summary>
+    public void CancelHotkeyCapture()
+    {
+        if (IsCapturingHotkey)
+        {
+            IsCapturingHotkey = false;
+            UpdateHotkeyDisplay();
+        }
     }
 
     /// <summary>
