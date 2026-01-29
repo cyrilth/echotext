@@ -25,7 +25,8 @@
       "Bash(done)",
       "Bash(taskkill:*)",
       "Bash(dotnet test:*)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(xargs:*)"
     ],
     "deny": [],
     "ask": []

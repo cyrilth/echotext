@@ -339,7 +339,7 @@ Implement Linux-specific platform providers.
 | **ID** | TASK-304 |
 | **Complexity** | 🔴 Complex |
 | **Dependencies** | TASK-301 |
-| **Status** | ⬜ Not Started |
+| **Status** | ✅ Complete |
 
 **Description:**
 Implement macOS-specific platform providers.
@@ -351,11 +351,11 @@ Implement macOS-specific platform providers.
 4. `Platform/MacOS/MacOSOutputProvider.cs` - Using SharpHook
 
 **Acceptance Criteria:**
-- [ ] Hotkey works (with Accessibility permission)
-- [ ] Audio capture works (with Microphone permission)
-- [ ] Clipboard works
-- [ ] Auto-type works (with Accessibility permission)
-- [ ] Permission prompts shown appropriately
+- [x] Hotkey works (with Accessibility permission)
+- [x] Audio capture works (with Microphone permission)
+- [x] Clipboard works
+- [x] Auto-type works (with Accessibility permission)
+- [x] Permission prompts shown appropriately
 
 ---
 
