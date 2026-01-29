@@ -12,7 +12,10 @@
       "Bash(dir:*)",
       "Bash(dotnet test)",
       "Bash(test:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(sed:*)",
+      "Bash(dotnet restore:*)"
     ],
     "deny": [],
     "ask": []
