@@ -20,6 +20,7 @@ public partial class SettingsViewModel : ViewModelBase
     private readonly IAudioService _audioService;
     private readonly IModelManager _modelManager;
     private readonly IHotkeyService _hotkeyService;
+    private readonly INotificationService _notificationService;
 
     // Working copy of settings (not saved until user clicks Save)
     private AppSettings _workingSettings;
@@ -99,12 +100,14 @@ public partial class SettingsViewModel : ViewModelBase
         IConfigService configService,
         IAudioService audioService,
         IModelManager modelManager,
-        IHotkeyService hotkeyService)
+        IHotkeyService hotkeyService,
+        INotificationService notificationService)
     {
         _configService = configService ?? throw new ArgumentNullException(nameof(configService));
         _audioService = audioService ?? throw new ArgumentNullException(nameof(audioService));
         _modelManager = modelManager ?? throw new ArgumentNullException(nameof(modelManager));
         _hotkeyService = hotkeyService ?? throw new ArgumentNullException(nameof(hotkeyService));
+        _notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
 
         // Create a working copy of settings
         _workingSettings = CloneSettings(_configService.Settings);
@@ -154,9 +157,14 @@ public partial class SettingsViewModel : ViewModelBase
                 SelectedAudioDevice = AudioDevices.FirstOrDefault(d => d.IsDefault);
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // Handle error - could show notification
+            // Log the error and notify user
+            System.Diagnostics.Debug.WriteLine($"Failed to load audio devices: {ex.Message}");
+            await _notificationService.ShowNotificationAsync(
+                "Audio Device Error",
+                "Failed to load audio devices. Please check your audio settings.",
+                NotificationType.Error);
         }
         finally
         {
@@ -185,9 +193,14 @@ public partial class SettingsViewModel : ViewModelBase
             SelectedModel = AvailableModels.FirstOrDefault(m => m.Name == _workingSettings.Recognition.ModelName)
                 ?? AvailableModels.FirstOrDefault();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // Handle error - could show notification
+            // Log the error and notify user
+            System.Diagnostics.Debug.WriteLine($"Failed to load models: {ex.Message}");
+            await _notificationService.ShowNotificationAsync(
+                "Model Loading Error",
+                "Failed to load available models. Please try again later.",
+                NotificationType.Error);
         }
         finally
         {
@@ -391,8 +404,27 @@ public partial class SettingsViewModel : ViewModelBase
         // Re-register hotkey if it changed
         if (_hotkeyService.IsRegistered)
         {
-            await _hotkeyService.UnregisterAsync();
-            await _hotkeyService.RegisterAsync();
+            try
+            {
+                await _hotkeyService.UnregisterAsync();
+                var success = await _hotkeyService.RegisterAsync();
+
+                if (!success)
+                {
+                    await _notificationService.ShowNotificationAsync(
+                        "Hotkey Registration Failed",
+                        "Failed to register the new hotkey. It may be in use by another application.",
+                        NotificationType.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Failed to re-register hotkey: {ex.Message}");
+                await _notificationService.ShowNotificationAsync(
+                    "Hotkey Registration Error",
+                    "An error occurred while registering the hotkey. Please try again.",
+                    NotificationType.Error);
+            }
         }
     }
 

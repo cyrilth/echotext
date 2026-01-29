@@ -47,6 +47,7 @@ sealed class Program
         services.AddSingleton<IClipboardService, ClipboardService>();
         services.AddSingleton<IOutputService, OutputService>();
         services.AddSingleton<INotificationService, NotificationService>();
+        services.AddSingleton<IWindowService, WindowService>();
 
         // Register ViewModels
         services.AddSingleton<ViewModels.MainViewModel>();
