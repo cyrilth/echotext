@@ -61,7 +61,7 @@ public class ConfigService : IConfigService
             if (File.Exists(_configFilePath))
             {
                 var json = await File.ReadAllTextAsync(_configFilePath);
-                var settings = JsonSerializer.Deserialize<AppSettings>(json, GetJsonOptions());
+                var settings = JsonSerializer.Deserialize(json, AppSettingsJsonContext.Default.AppSettings);
                 if (settings != null)
                 {
                     _settings = settings;
@@ -126,20 +126,7 @@ public class ConfigService : IConfigService
         }
 
         // Serialize and write settings
-        var json = JsonSerializer.Serialize(_settings, GetJsonOptions());
+        var json = JsonSerializer.Serialize(_settings, AppSettingsJsonContext.Default.AppSettings);
         await File.WriteAllTextAsync(_configFilePath, json);
-    }
-
-    /// <summary>
-    /// Gets JSON serialization options with proper formatting.
-    /// </summary>
-    private static JsonSerializerOptions GetJsonOptions()
-    {
-        return new JsonSerializerOptions
-        {
-            WriteIndented = true,
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() }
-        };
     }
 }

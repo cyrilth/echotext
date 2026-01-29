@@ -45,7 +45,9 @@
       "Bash(Get-ChildItem \"$env:APPDATA\\\\EchoText\\\\logs\" -Filter \"*.log\")",
       "Bash(Sort-Object LastWriteTime -Descending)",
       "Bash(Select-Object -First 1)",
-      "Bash(Get-Content -Tail 50)"
+      "Bash(Get-Content -Tail 50)",
+      "Bash(git push:*)",
+      "Bash(git tag:*)"
     ],
     "deny": [],
     "ask": []
