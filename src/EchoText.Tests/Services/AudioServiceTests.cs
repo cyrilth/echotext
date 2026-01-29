@@ -6,6 +6,7 @@ using EchoText.Platform.Interfaces;
 using EchoText.Services;
 using EchoText.Services.Interfaces;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
@@ -15,12 +16,14 @@ public class AudioServiceTests
 {
     private readonly Mock<IPlatformAudio> _mockPlatformAudio;
     private readonly Mock<IConfigService> _mockConfigService;
+    private readonly Mock<ILogger<AudioService>> _mockLogger;
     private readonly AudioService _audioService;
 
     public AudioServiceTests()
     {
         _mockPlatformAudio = new Mock<IPlatformAudio>();
         _mockConfigService = new Mock<IConfigService>();
+        _mockLogger = new Mock<ILogger<AudioService>>();
 
         // Setup default config
         _mockConfigService.Setup(x => x.Settings).Returns(new AppSettings
@@ -28,7 +31,7 @@ public class AudioServiceTests
             SelectedAudioDevice = null
         });
 
-        _audioService = new AudioService(_mockPlatformAudio.Object, _mockConfigService.Object);
+        _audioService = new AudioService(_mockPlatformAudio.Object, _mockConfigService.Object, _mockLogger.Object);
     }
 
     [Fact]
@@ -173,13 +176,13 @@ public class AudioServiceTests
     public void Constructor_WithNullPlatformAudio_ShouldThrowArgumentNullException()
     {
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => new AudioService(null!, _mockConfigService.Object));
+        Assert.Throws<ArgumentNullException>(() => new AudioService(null!, _mockConfigService.Object, _mockLogger.Object));
     }
 
     [Fact]
     public void Constructor_WithNullConfigService_ShouldThrowArgumentNullException()
     {
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => new AudioService(_mockPlatformAudio.Object, null!));
+        Assert.Throws<ArgumentNullException>(() => new AudioService(_mockPlatformAudio.Object, null!, _mockLogger.Object));
     }
 }

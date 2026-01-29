@@ -1,5 +1,7 @@
 using EchoText.Services;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
+using Moq;
 using System;
 using System.IO;
 using System.Linq;
@@ -12,11 +14,13 @@ namespace EchoText.Tests.Services;
 public class ModelManagerTests : IDisposable
 {
     private readonly ModelManager _modelManager;
+    private readonly Mock<ILogger<ModelManager>> _mockLogger;
     private readonly string _testModelsDirectory;
 
     public ModelManagerTests()
     {
-        _modelManager = new ModelManager();
+        _mockLogger = new Mock<ILogger<ModelManager>>();
+        _modelManager = new ModelManager(_mockLogger.Object);
 
         // Use a test-specific models directory
         _testModelsDirectory = Path.Combine(Path.GetTempPath(), "EchoTextTests", Guid.NewGuid().ToString());

@@ -1,6 +1,7 @@
 using EchoText.Models;
 using EchoText.Platform;
 using EchoText.Services.Interfaces;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,6 +20,7 @@ public class ModelManager : IModelManager
     private static readonly HttpClient _httpClient = new();
     private static readonly SemaphoreSlim _downloadLock = new(1, 1);
     private static string? _currentlyDownloading;
+    private readonly ILogger<ModelManager> _logger;
 
     private static readonly Dictionary<string, ModelInfo> _modelDefinitions = new()
     {
@@ -48,6 +50,12 @@ public class ModelManager : IModelManager
             2_900_000_000,
             "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3.bin")
     };
+
+    public ModelManager(ILogger<ModelManager> logger)
+    {
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _logger.LogInformation("ModelManager initialized");
+    }
 
     /// <summary>
     /// Get list of available models (downloaded + available for download)
@@ -84,6 +92,7 @@ public class ModelManager : IModelManager
     {
         if (!_modelDefinitions.TryGetValue(modelName, out var modelInfo))
         {
+            _logger.LogError("Attempted to download unknown model: {ModelName}", modelName);
             throw new ArgumentException($"Unknown model: {modelName}", nameof(modelName));
         }
 
@@ -94,9 +103,12 @@ public class ModelManager : IModelManager
             // Check if this model is already being downloaded
             if (_currentlyDownloading == modelName)
             {
+                _logger.LogWarning("Model '{ModelName}' is already being downloaded", modelName);
                 throw new InvalidOperationException($"Model '{modelName}' is already being downloaded.");
             }
             _currentlyDownloading = modelName;
+
+            _logger.LogInformation("Starting download of model '{ModelName}' from {Url}", modelName, modelInfo.Url);
 
             EnsureModelsDirectoryExists();
 
@@ -108,6 +120,7 @@ public class ModelManager : IModelManager
                 // Delete temp file if it exists from a previous failed download
                 if (File.Exists(tempPath))
                 {
+                    _logger.LogDebug("Cleaning up temp file from previous download: {TempPath}", tempPath);
                     File.Delete(tempPath);
                 }
 
@@ -116,6 +129,8 @@ public class ModelManager : IModelManager
 
                 var totalBytes = response.Content.Headers.ContentLength ?? modelInfo.SizeBytes;
                 var downloadedBytes = 0L;
+
+                _logger.LogInformation("Downloading {TotalMB:F1} MB for model '{ModelName}'", totalBytes / 1_000_000.0, modelName);
 
                 // Use explicit using blocks so streams are closed before File.Move
                 using (var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken))
@@ -145,11 +160,15 @@ public class ModelManager : IModelManager
                 }
                 File.Move(tempPath, modelPath);
 
+                _logger.LogInformation("Model '{ModelName}' downloaded successfully to {ModelPath}", modelName, modelPath);
+
                 // Report 100% completion
                 progress?.Report(1.0);
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Failed to download model '{ModelName}'", modelName);
+
                 // Clean up temp file on error
                 if (File.Exists(tempPath))
                 {
@@ -209,13 +228,19 @@ public class ModelManager : IModelManager
     {
         if (!_modelDefinitions.ContainsKey(modelName))
         {
+            _logger.LogError("Attempted to delete unknown model: {ModelName}", modelName);
             throw new ArgumentException($"Unknown model: {modelName}", nameof(modelName));
         }
 
         var modelPath = GetModelFilePath(modelName);
         if (File.Exists(modelPath))
         {
+            _logger.LogInformation("Deleting model '{ModelName}' from {ModelPath}", modelName, modelPath);
             File.Delete(modelPath);
+        }
+        else
+        {
+            _logger.LogWarning("Attempted to delete model '{ModelName}' but file not found", modelName);
         }
 
         return Task.CompletedTask;

@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using EchoText.Models;
 using EchoText.Services;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
+using Moq;
 using Xunit;
 
 namespace EchoText.Tests.Services;
@@ -12,6 +14,7 @@ public class ConfigServiceTests : IDisposable
 {
     private readonly string _testConfigDirectory;
     private readonly string _testConfigFile;
+    private readonly Mock<ILogger<ConfigService>> _mockLogger;
 
     public ConfigServiceTests()
     {
@@ -19,6 +22,9 @@ public class ConfigServiceTests : IDisposable
         _testConfigDirectory = Path.Combine(Path.GetTempPath(), "EchoTextTests", Guid.NewGuid().ToString());
         _testConfigFile = Path.Combine(_testConfigDirectory, "settings.json");
         Directory.CreateDirectory(_testConfigDirectory);
+
+        // Create mock logger
+        _mockLogger = new Mock<ILogger<ConfigService>>();
     }
 
     public void Dispose()
@@ -34,7 +40,7 @@ public class ConfigServiceTests : IDisposable
     public async Task LoadAsync_CreatesConfigDirectoryIfNotExists()
     {
         // Arrange
-        var service = new ConfigService(_testConfigFile);
+        var service = new ConfigService(_mockLogger.Object, _testConfigFile);
 
         // Act
         var act = async () => await service.LoadAsync();
@@ -47,7 +53,7 @@ public class ConfigServiceTests : IDisposable
     public async Task LoadAsync_CreatesDefaultConfigIfFileDoesNotExist()
     {
         // Arrange
-        var service = new ConfigService(_testConfigFile);
+        var service = new ConfigService(_mockLogger.Object, _testConfigFile);
 
         // Act
         await service.LoadAsync();
@@ -64,7 +70,7 @@ public class ConfigServiceTests : IDisposable
     public async Task Settings_HasCorrectDefaultValues()
     {
         // Arrange
-        var service = new ConfigService(_testConfigFile);
+        var service = new ConfigService(_mockLogger.Object, _testConfigFile);
 
         // Act
         await service.LoadAsync();
@@ -91,7 +97,7 @@ public class ConfigServiceTests : IDisposable
     public async Task SaveAsync_FiresSettingsChangedEvent()
     {
         // Arrange
-        var service = new ConfigService(_testConfigFile);
+        var service = new ConfigService(_mockLogger.Object, _testConfigFile);
         await service.LoadAsync();
 
         var eventFired = false;
@@ -108,7 +114,7 @@ public class ConfigServiceTests : IDisposable
     public async Task SaveAsync_ThenLoadAsync_PreservesSettings()
     {
         // Arrange
-        var service1 = new ConfigService(_testConfigFile);
+        var service1 = new ConfigService(_mockLogger.Object, _testConfigFile);
         await service1.LoadAsync();
 
         // Modify settings
@@ -121,7 +127,7 @@ public class ConfigServiceTests : IDisposable
         await service1.SaveAsync();
 
         // Load with second service
-        var service2 = new ConfigService(_testConfigFile);
+        var service2 = new ConfigService(_mockLogger.Object, _testConfigFile);
         await service2.LoadAsync();
 
         // Assert
@@ -135,7 +141,7 @@ public class ConfigServiceTests : IDisposable
     public async Task LoadAsync_WithInvalidJson_CreatesDefaultSettings()
     {
         // Arrange
-        var service = new ConfigService(_testConfigFile);
+        var service = new ConfigService(_mockLogger.Object, _testConfigFile);
 
         // Act
         await service.LoadAsync();
@@ -148,7 +154,7 @@ public class ConfigServiceTests : IDisposable
     public async Task Settings_IsThreadSafe()
     {
         // Arrange
-        var service = new ConfigService(_testConfigFile);
+        var service = new ConfigService(_mockLogger.Object, _testConfigFile);
         await service.LoadAsync();
 
         // Act - Multiple concurrent save operations

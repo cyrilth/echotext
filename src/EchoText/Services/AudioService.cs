@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using EchoText.Models;
 using EchoText.Platform.Interfaces;
 using EchoText.Services.Interfaces;
@@ -18,6 +19,7 @@ public class AudioService : IAudioService
 
     private readonly IPlatformAudio _platformAudio;
     private readonly IConfigService _configService;
+    private readonly ILogger<AudioService> _logger;
     private Timer? _maxDurationTimer;
     private bool _disposed;
 
@@ -26,10 +28,14 @@ public class AudioService : IAudioService
     /// </summary>
     /// <param name="platformAudio">Platform-specific audio provider.</param>
     /// <param name="configService">Configuration service for device selection.</param>
-    public AudioService(IPlatformAudio platformAudio, IConfigService configService)
+    /// <param name="logger">Logger for diagnostic output.</param>
+    public AudioService(IPlatformAudio platformAudio, IConfigService configService, ILogger<AudioService> logger)
     {
         _platformAudio = platformAudio ?? throw new ArgumentNullException(nameof(platformAudio));
         _configService = configService ?? throw new ArgumentNullException(nameof(configService));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+        _logger.LogInformation("AudioService initialized");
 
         // Forward audio level events from platform provider
         _platformAudio.AudioLevelChanged += OnPlatformAudioLevelChanged;
@@ -47,7 +53,13 @@ public class AudioService : IAudioService
     /// <inheritdoc/>
     public Task<IReadOnlyList<AudioDevice>> GetInputDevicesAsync()
     {
-        return Task.Run(() => _platformAudio.GetInputDevices());
+        return Task.Run(() =>
+        {
+            _logger.LogDebug("Getting list of input devices");
+            var devices = _platformAudio.GetInputDevices();
+            _logger.LogInformation("Found {DeviceCount} audio input device(s)", devices.Count);
+            return devices;
+        });
     }
 
     /// <inheritdoc/>
@@ -57,22 +69,35 @@ public class AudioService : IAudioService
         {
             if (IsRecording)
             {
+                _logger.LogWarning("Attempted to start recording while already recording");
                 throw new InvalidOperationException("Recording is already in progress.");
             }
 
             // Use provided device ID, or fall back to configured device, or null for default
             var actualDeviceId = deviceId ?? _configService.Settings.SelectedAudioDevice;
 
-            // Start recording
-            _platformAudio.StartCapture(actualDeviceId);
+            _logger.LogInformation("Starting audio recording on device: {DeviceId}", actualDeviceId ?? "(default)");
 
-            // Set up max duration timer
-            _maxDurationTimer = new Timer(
-                OnMaxDurationReached,
-                null,
-                TimeSpan.FromSeconds(MaxRecordingSeconds),
-                Timeout.InfiniteTimeSpan
-            );
+            try
+            {
+                // Start recording
+                _platformAudio.StartCapture(actualDeviceId);
+
+                // Set up max duration timer
+                _maxDurationTimer = new Timer(
+                    OnMaxDurationReached,
+                    null,
+                    TimeSpan.FromSeconds(MaxRecordingSeconds),
+                    Timeout.InfiniteTimeSpan
+                );
+
+                _logger.LogInformation("Audio recording started successfully");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to start audio recording");
+                throw;
+            }
         });
     }
 
@@ -83,15 +108,28 @@ public class AudioService : IAudioService
         {
             if (!IsRecording)
             {
+                _logger.LogWarning("Attempted to stop recording when not recording");
                 throw new InvalidOperationException("No recording is in progress.");
             }
 
-            // Cancel max duration timer
-            _maxDurationTimer?.Dispose();
-            _maxDurationTimer = null;
+            _logger.LogInformation("Stopping audio recording");
 
-            // Stop capture and get audio data
-            return _platformAudio.StopCapture();
+            try
+            {
+                // Cancel max duration timer
+                _maxDurationTimer?.Dispose();
+                _maxDurationTimer = null;
+
+                // Stop capture and get audio data
+                var audioData = _platformAudio.StopCapture();
+                _logger.LogInformation("Audio recording stopped successfully, captured {DataSize} bytes", audioData.Length);
+                return audioData;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to stop audio recording");
+                throw;
+            }
         });
     }
 
@@ -110,6 +148,8 @@ public class AudioService : IAudioService
     {
         if (IsRecording)
         {
+            _logger.LogWarning("Maximum recording duration of {MaxSeconds} seconds reached, auto-stopping", MaxRecordingSeconds);
+
             // Stop recording (this will discard the timer already)
             _ = Task.Run(async () =>
             {
@@ -117,9 +157,9 @@ public class AudioService : IAudioService
                 {
                     await StopRecordingAsync();
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // Silently handle - this is a safety mechanism
+                    _logger.LogError(ex, "Error stopping recording after max duration reached");
                 }
             });
         }

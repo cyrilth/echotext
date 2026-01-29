@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.Logging;
 using EchoText.Models;
 using EchoText.Services.Interfaces;
 
@@ -24,6 +25,7 @@ public partial class MainViewModel : ViewModelBase
     private readonly IConfigService _configService;
     private readonly IModelManager _modelManager;
     private readonly IUpdateService _updateService;
+    private readonly ILogger<MainViewModel> _logger;
 
     [ObservableProperty]
     private string _statusText = "Idle";
@@ -44,6 +46,7 @@ public partial class MainViewModel : ViewModelBase
     /// <param name="configService">Configuration service for settings</param>
     /// <param name="modelManager">Model manager for Whisper models</param>
     /// <param name="updateService">Update service for checking GitHub releases</param>
+    /// <param name="logger">Logger for diagnostic output</param>
     public MainViewModel(
         IAppStateManager appStateManager,
         IWindowService windowService,
@@ -54,7 +57,8 @@ public partial class MainViewModel : ViewModelBase
         INotificationService notificationService,
         IConfigService configService,
         IModelManager modelManager,
-        IUpdateService updateService)
+        IUpdateService updateService,
+        ILogger<MainViewModel> logger)
     {
         _appStateManager = appStateManager ?? throw new ArgumentNullException(nameof(appStateManager));
         _windowService = windowService ?? throw new ArgumentNullException(nameof(windowService));
@@ -66,6 +70,9 @@ public partial class MainViewModel : ViewModelBase
         _configService = configService ?? throw new ArgumentNullException(nameof(configService));
         _modelManager = modelManager ?? throw new ArgumentNullException(nameof(modelManager));
         _updateService = updateService ?? throw new ArgumentNullException(nameof(updateService));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+        _logger.LogInformation("MainViewModel initialized");
 
         // Subscribe to state changes
         _appStateManager.StateChanged += OnAppStateChanged;
@@ -188,9 +195,11 @@ public partial class MainViewModel : ViewModelBase
     {
         try
         {
+            _logger.LogInformation("Starting application initialization");
             _appStateManager.TransitionTo(AppState.Loading);
 
             // Load configuration
+            _logger.LogInformation("Loading application configuration");
             await _configService.LoadAsync();
 
             // Check if this is the first run (no models downloaded)
@@ -199,11 +208,13 @@ public partial class MainViewModel : ViewModelBase
 
             if (!hasDownloadedModel)
             {
+                _logger.LogWarning("No Whisper models downloaded, showing first-run dialog");
                 // Show first-run dialog
                 var modelDownloaded = await _windowService.ShowFirstRunDialogAsync();
 
                 if (!modelDownloaded)
                 {
+                    _logger.LogWarning("User skipped model download in first-run dialog");
                     // User skipped - show warning notification
                     await _notificationService.ShowNotificationAsync(
                         "No Model Downloaded",
@@ -212,6 +223,7 @@ public partial class MainViewModel : ViewModelBase
                 }
                 else
                 {
+                    _logger.LogInformation("Model downloaded via first-run dialog");
                     // Reload available models after download
                     availableModels = await _modelManager.GetAvailableModelsAsync();
                 }
@@ -221,20 +233,28 @@ public partial class MainViewModel : ViewModelBase
             var modelPath = _modelManager.GetModelPath(_configService.Settings.Recognition.ModelName);
             if (!string.IsNullOrEmpty(modelPath))
             {
+                _logger.LogInformation("Loading Whisper model: {ModelName}", _configService.Settings.Recognition.ModelName);
                 var loadResult = await _transcriptionService.LoadModelAsync(modelPath);
                 if (!loadResult.IsSuccess)
                 {
+                    _logger.LogError("Failed to load Whisper model: {Error}", loadResult.Error);
                     await _notificationService.ShowNotificationAsync(
                         "Model Load Failed",
                         $"Failed to load model: {loadResult.Error}",
                         NotificationType.Error);
                 }
             }
+            else
+            {
+                _logger.LogWarning("No model available to load");
+            }
 
             // Register hotkey
+            _logger.LogInformation("Registering global hotkey");
             var registered = await _hotkeyService.RegisterAsync();
             if (!registered)
             {
+                _logger.LogWarning("Failed to register global hotkey");
                 await _notificationService.ShowNotificationAsync(
                     "Hotkey Registration Failed",
                     "Failed to register global hotkey. Check settings.",
@@ -243,6 +263,7 @@ public partial class MainViewModel : ViewModelBase
 
             // Transition to idle
             _appStateManager.TransitionTo(AppState.Idle);
+            _logger.LogInformation("Application initialization completed successfully");
 
             // Check for updates on startup if enabled in settings
             if (_configService.Settings.General.CheckForUpdates)
@@ -252,6 +273,7 @@ public partial class MainViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Application initialization failed");
             _appStateManager.TransitionTo(AppState.Error);
             await _notificationService.ShowNotificationAsync(
                 "Initialization Failed",
@@ -269,6 +291,8 @@ public partial class MainViewModel : ViewModelBase
         {
             var mode = _configService.Settings.Hotkey.Mode;
             var currentState = _appStateManager.CurrentState;
+
+            _logger.LogDebug("Hotkey pressed, mode: {Mode}, state: {State}", mode, currentState);
 
             if (mode == HotkeyMode.PushToTalk)
             {
@@ -294,6 +318,7 @@ public partial class MainViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Error handling hotkey press");
             _appStateManager.TransitionTo(AppState.Error);
             await _notificationService.ShowNotificationAsync(
                 "Error",
@@ -316,6 +341,8 @@ public partial class MainViewModel : ViewModelBase
             var mode = _configService.Settings.Hotkey.Mode;
             var currentState = _appStateManager.CurrentState;
 
+            _logger.LogDebug("Hotkey released, mode: {Mode}, state: {State}", mode, currentState);
+
             // Only handle release in Push-to-Talk mode
             if (mode == HotkeyMode.PushToTalk && currentState == AppState.Recording)
             {
@@ -324,6 +351,7 @@ public partial class MainViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Error handling hotkey release");
             _appStateManager.TransitionTo(AppState.Error);
             await _notificationService.ShowNotificationAsync(
                 "Error",
@@ -341,6 +369,8 @@ public partial class MainViewModel : ViewModelBase
     /// </summary>
     private async Task StartRecordingAsync()
     {
+        _logger.LogInformation("Starting audio recording");
+
         // Transition to recording state
         _appStateManager.TransitionTo(AppState.Recording);
 
@@ -362,6 +392,8 @@ public partial class MainViewModel : ViewModelBase
     /// </summary>
     private async Task StopRecordingAndProcessAsync()
     {
+        _logger.LogInformation("Stopping audio recording and processing");
+
         // Stop audio capture
         var audioData = await _audioService.StopRecordingAsync();
 
@@ -380,6 +412,7 @@ public partial class MainViewModel : ViewModelBase
         // Check if we have audio data
         if (audioData == null || audioData.Length == 0)
         {
+            _logger.LogWarning("No audio data captured");
             await _notificationService.ShowNotificationAsync(
                 "No Audio",
                 "No audio was recorded.",
@@ -395,11 +428,16 @@ public partial class MainViewModel : ViewModelBase
             language = null; // Use auto-detect
         }
 
+        _logger.LogInformation("Starting transcription of {AudioSize} bytes, language: {Language}",
+            audioData.Length, language ?? "auto");
+
         var transcriptionResult = await _transcriptionService.TranscribeAsync(audioData, language);
 
         if (!transcriptionResult.IsSuccess || string.IsNullOrWhiteSpace(transcriptionResult.Value))
         {
             // Transcription failed or returned empty
+            _logger.LogWarning("Transcription failed or returned empty: {Error}",
+                transcriptionResult.Error ?? "No speech detected");
             await _notificationService.ShowNotificationAsync(
                 "Transcription Failed",
                 transcriptionResult.Error ?? "No speech detected or transcription returned empty.",
@@ -411,6 +449,8 @@ public partial class MainViewModel : ViewModelBase
 
         // Output the transcribed text
         var transcribedText = transcriptionResult.Value;
+        _logger.LogInformation("Transcription successful, outputting {TextLength} characters", transcribedText.Length);
+
         await _outputService.OutputTextAsync(transcribedText);
 
         // Show success notification
@@ -424,6 +464,8 @@ public partial class MainViewModel : ViewModelBase
         {
             await _notificationService.PlaySoundAsync(SoundEffect.Success);
         }
+
+        _logger.LogInformation("Recording workflow completed successfully");
 
         // Return to idle state
         _appStateManager.TransitionTo(AppState.Idle);

@@ -1,6 +1,7 @@
 using EchoText.Models;
 using EchoText.Services;
 using EchoText.Services.Interfaces;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using FluentAssertions;
@@ -12,19 +13,21 @@ namespace EchoText.Tests.Services;
 public class TranscriptionServiceTests
 {
     private readonly Mock<IModelManager> _mockModelManager;
+    private readonly Mock<ILogger<TranscriptionService>> _mockLogger;
     private readonly TranscriptionService _service;
 
     public TranscriptionServiceTests()
     {
         _mockModelManager = new Mock<IModelManager>();
-        _service = new TranscriptionService(_mockModelManager.Object);
+        _mockLogger = new Mock<ILogger<TranscriptionService>>();
+        _service = new TranscriptionService(_mockModelManager.Object, _mockLogger.Object);
     }
 
     [Fact]
     public void Constructor_WithNullModelManager_ShouldThrowArgumentNullException()
     {
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => new TranscriptionService(null!));
+        Assert.Throws<ArgumentNullException>(() => new TranscriptionService(null!, _mockLogger.Object));
     }
 
     [Fact]

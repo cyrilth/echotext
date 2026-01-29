@@ -4,6 +4,7 @@ using EchoText.Models;
 using EchoText.Services.Interfaces;
 using EchoText.ViewModels;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
@@ -21,6 +22,7 @@ public class MainViewModelTests
     private readonly Mock<IConfigService> _mockConfigService;
     private readonly Mock<IModelManager> _mockModelManager;
     private readonly Mock<IUpdateService> _mockUpdateService;
+    private readonly Mock<ILogger<MainViewModel>> _mockLogger;
     private readonly AppSettings _testSettings;
 
     public MainViewModelTests()
@@ -35,6 +37,7 @@ public class MainViewModelTests
         _mockConfigService = new Mock<IConfigService>();
         _mockModelManager = new Mock<IModelManager>();
         _mockUpdateService = new Mock<IUpdateService>();
+        _mockLogger = new Mock<ILogger<MainViewModel>>();
 
         // Setup default test settings
         _testSettings = new AppSettings
@@ -107,7 +110,8 @@ public class MainViewModelTests
             _mockNotificationService.Object,
             _mockConfigService.Object,
             _mockModelManager.Object,
-            _mockUpdateService.Object);
+            _mockUpdateService.Object,
+            _mockLogger.Object);
 
         act.Should().Throw<ArgumentNullException>();
     }
@@ -501,6 +505,7 @@ public class MainViewModelTests
             _mockNotificationService.Object,
             _mockConfigService.Object,
             _mockModelManager.Object,
-            _mockUpdateService.Object);
+            _mockUpdateService.Object,
+            _mockLogger.Object);
     }
 }

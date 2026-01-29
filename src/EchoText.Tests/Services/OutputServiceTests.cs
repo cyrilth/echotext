@@ -5,6 +5,7 @@ using EchoText.Platform.Interfaces;
 using EchoText.Services;
 using EchoText.Services.Interfaces;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
@@ -15,6 +16,7 @@ public class OutputServiceTests
     private readonly Mock<IConfigService> _mockConfigService;
     private readonly Mock<IClipboardService> _mockClipboardService;
     private readonly Mock<IPlatformOutput> _mockPlatformOutput;
+    private readonly Mock<ILogger<OutputService>> _mockLogger;
     private readonly IOutputService _outputService;
     private readonly AppSettings _appSettings;
 
@@ -23,6 +25,7 @@ public class OutputServiceTests
         _mockConfigService = new Mock<IConfigService>();
         _mockClipboardService = new Mock<IClipboardService>();
         _mockPlatformOutput = new Mock<IPlatformOutput>();
+        _mockLogger = new Mock<ILogger<OutputService>>();
 
         // Setup default settings
         _appSettings = new AppSettings
@@ -42,14 +45,15 @@ public class OutputServiceTests
         _outputService = new OutputService(
             _mockConfigService.Object,
             _mockClipboardService.Object,
-            _mockPlatformOutput.Object);
+            _mockPlatformOutput.Object,
+            _mockLogger.Object);
     }
 
     [Fact]
     public void Constructor_WithNullConfigService_ThrowsArgumentNullException()
     {
         // Act & Assert
-        Action act = () => new OutputService(null!, _mockClipboardService.Object, _mockPlatformOutput.Object);
+        Action act = () => new OutputService(null!, _mockClipboardService.Object, _mockPlatformOutput.Object, _mockLogger.Object);
         act.Should().Throw<ArgumentNullException>()
             .WithParameterName("configService");
     }
@@ -58,7 +62,7 @@ public class OutputServiceTests
     public void Constructor_WithNullClipboardService_ThrowsArgumentNullException()
     {
         // Act & Assert
-        Action act = () => new OutputService(_mockConfigService.Object, null!, _mockPlatformOutput.Object);
+        Action act = () => new OutputService(_mockConfigService.Object, null!, _mockPlatformOutput.Object, _mockLogger.Object);
         act.Should().Throw<ArgumentNullException>()
             .WithParameterName("clipboardService");
     }
@@ -67,7 +71,7 @@ public class OutputServiceTests
     public void Constructor_WithNullPlatformOutput_ThrowsArgumentNullException()
     {
         // Act & Assert
-        Action act = () => new OutputService(_mockConfigService.Object, _mockClipboardService.Object, null!);
+        Action act = () => new OutputService(_mockConfigService.Object, _mockClipboardService.Object, null!, _mockLogger.Object);
         act.Should().Throw<ArgumentNullException>()
             .WithParameterName("platformOutput");
     }

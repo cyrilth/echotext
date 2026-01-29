@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using EchoText.Models;
 using EchoText.Platform.Interfaces;
 using EchoText.Services.Interfaces;
@@ -14,6 +15,7 @@ public sealed class HotkeyService : IHotkeyService
 {
     private readonly IPlatformHotkey _platformHotkey;
     private readonly IConfigService _configService;
+    private readonly ILogger<HotkeyService> _logger;
     private bool _isToggled; // Tracks toggle state for Toggle mode
     private bool _disposed;
 
@@ -31,10 +33,14 @@ public sealed class HotkeyService : IHotkeyService
     /// </summary>
     /// <param name="platformHotkey">Platform-specific hotkey provider</param>
     /// <param name="configService">Configuration service for hotkey settings</param>
-    public HotkeyService(IPlatformHotkey platformHotkey, IConfigService configService)
+    /// <param name="logger">Logger for diagnostic output</param>
+    public HotkeyService(IPlatformHotkey platformHotkey, IConfigService configService, ILogger<HotkeyService> logger)
     {
         _platformHotkey = platformHotkey ?? throw new ArgumentNullException(nameof(platformHotkey));
         _configService = configService ?? throw new ArgumentNullException(nameof(configService));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+        _logger.LogInformation("HotkeyService initialized");
 
         // Subscribe to platform hotkey events
         _platformHotkey.HotkeyPressed += OnPlatformHotkeyPressed;
@@ -50,12 +56,20 @@ public sealed class HotkeyService : IHotkeyService
         ObjectDisposedException.ThrowIf(_disposed, this);
 
         var settings = _configService.Settings.Hotkey;
+        _logger.LogInformation("Registering global hotkey: {Modifiers}+{Key}, mode: {Mode}",
+            settings.Modifiers, settings.Key, settings.Mode);
+
         var success = _platformHotkey.Register(settings.Modifiers, settings.Key);
 
         if (success)
         {
             // Reset toggle state when registering
             _isToggled = false;
+            _logger.LogInformation("Hotkey registered successfully");
+        }
+        else
+        {
+            _logger.LogWarning("Failed to register hotkey");
         }
 
         return Task.FromResult(success);
@@ -66,6 +80,7 @@ public sealed class HotkeyService : IHotkeyService
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
 
+        _logger.LogInformation("Unregistering global hotkey");
         _platformHotkey.Unregister();
         _isToggled = false;
 
@@ -78,6 +93,8 @@ public sealed class HotkeyService : IHotkeyService
     private void OnPlatformHotkeyPressed(object? sender, EventArgs e)
     {
         var mode = _configService.Settings.Hotkey.Mode;
+
+        _logger.LogDebug("Hotkey pressed, mode: {Mode}", mode);
 
         if (mode == HotkeyMode.PushToTalk)
         {
@@ -100,6 +117,8 @@ public sealed class HotkeyService : IHotkeyService
     {
         var mode = _configService.Settings.Hotkey.Mode;
 
+        _logger.LogDebug("Hotkey released, mode: {Mode}", mode);
+
         // Only fire released event in PushToTalk mode
         if (mode == HotkeyMode.PushToTalk)
         {
@@ -112,6 +131,8 @@ public sealed class HotkeyService : IHotkeyService
     /// </summary>
     private async void OnSettingsChanged(object? sender, EventArgs e)
     {
+        _logger.LogInformation("Settings changed, re-registering hotkey");
+
         // Re-register hotkey if already registered
         if (IsRegistered)
         {

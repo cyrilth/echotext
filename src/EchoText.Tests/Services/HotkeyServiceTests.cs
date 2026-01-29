@@ -3,6 +3,7 @@ using EchoText.Platform.Interfaces;
 using EchoText.Services;
 using EchoText.Services.Interfaces;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
@@ -12,6 +13,7 @@ public class HotkeyServiceTests
 {
     private readonly Mock<IPlatformHotkey> _mockPlatformHotkey;
     private readonly Mock<IConfigService> _mockConfigService;
+    private readonly Mock<ILogger<HotkeyService>> _mockLogger;
     private readonly AppSettings _defaultSettings;
     private readonly HotkeyService _hotkeyService;
 
@@ -19,6 +21,7 @@ public class HotkeyServiceTests
     {
         _mockPlatformHotkey = new Mock<IPlatformHotkey>();
         _mockConfigService = new Mock<IConfigService>();
+        _mockLogger = new Mock<ILogger<HotkeyService>>();
 
         // Setup default settings
         _defaultSettings = new AppSettings
@@ -33,14 +36,14 @@ public class HotkeyServiceTests
 
         _mockConfigService.Setup(c => c.Settings).Returns(_defaultSettings);
 
-        _hotkeyService = new HotkeyService(_mockPlatformHotkey.Object, _mockConfigService.Object);
+        _hotkeyService = new HotkeyService(_mockPlatformHotkey.Object, _mockConfigService.Object, _mockLogger.Object);
     }
 
     [Fact]
     public void Constructor_ShouldThrowArgumentNullException_WhenPlatformHotkeyIsNull()
     {
         // Act & Assert
-        var act = () => new HotkeyService(null!, _mockConfigService.Object);
+        var act = () => new HotkeyService(null!, _mockConfigService.Object, _mockLogger.Object);
         act.Should().Throw<ArgumentNullException>().WithParameterName("platformHotkey");
     }
 
@@ -48,7 +51,7 @@ public class HotkeyServiceTests
     public void Constructor_ShouldThrowArgumentNullException_WhenConfigServiceIsNull()
     {
         // Act & Assert
-        var act = () => new HotkeyService(_mockPlatformHotkey.Object, null!);
+        var act = () => new HotkeyService(_mockPlatformHotkey.Object, null!, _mockLogger.Object);
         act.Should().Throw<ArgumentNullException>().WithParameterName("configService");
     }
 
@@ -61,7 +64,7 @@ public class HotkeyServiceTests
         configService.Setup(c => c.Settings).Returns(_defaultSettings);
 
         // Act
-        var service = new HotkeyService(platformHotkey.Object, configService.Object);
+        var service = new HotkeyService(platformHotkey.Object, configService.Object, _mockLogger.Object);
 
         // Assert - Verify event subscriptions by raising events
         var pressedCalled = false;
@@ -88,7 +91,7 @@ public class HotkeyServiceTests
         configService.Setup(c => c.Settings).Returns(_defaultSettings);
 
         // Act
-        var service = new HotkeyService(platformHotkey.Object, configService.Object);
+        var service = new HotkeyService(platformHotkey.Object, configService.Object, _mockLogger.Object);
 
         // Assert - The constructor subscribes to SettingsChanged
         // We can verify this by disposing and checking unsubscription behavior
