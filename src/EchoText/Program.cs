@@ -44,6 +44,7 @@ sealed class Program
         services.AddSingleton<IAudioService, AudioService>();
         services.AddSingleton<IModelManager, ModelManager>();
         services.AddSingleton<ITranscriptionService, TranscriptionService>();
+        services.AddSingleton<IClipboardService, ClipboardService>();
 
         // TODO: Register remaining core services here as they are implemented in later tasks
 
