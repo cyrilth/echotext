@@ -462,14 +462,14 @@ Implement audio capture service.
 - Enforce max recording duration (120 seconds)
 
 **Acceptance Criteria:**
-- [ ] Lists input devices correctly
-- [ ] Captures audio from selected device
-- [ ] Output format is 16kHz mono 16-bit WAV
-- [ ] AudioLevelChanged event fires during capture
-- [ ] Recording stops at max duration
-- [ ] IsRecording property is accurate
-- [ ] RecordingDuration property is accurate
-- [ ] Unit tests pass
+- [x] Lists input devices correctly
+- [x] Captures audio from selected device
+- [x] Output format is 16kHz mono 16-bit WAV
+- [x] AudioLevelChanged event fires during capture
+- [x] Recording stops at max duration
+- [x] IsRecording property is accurate
+- [x] RecordingDuration property is accurate
+- [x] Unit tests pass
 
 ---
 
