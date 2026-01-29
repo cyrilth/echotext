@@ -2,15 +2,26 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
-using System.Linq;
 using Avalonia.Markup.Xaml;
-using EchoText.ViewModels;
 using EchoText.Views;
+using System;
+using System.Linq;
 
 namespace EchoText;
 
 public partial class App : Application
 {
+    private readonly IServiceProvider? _serviceProvider;
+
+    public App()
+    {
+    }
+
+    public App(IServiceProvider? serviceProvider)
+    {
+        _serviceProvider = serviceProvider;
+    }
+
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
@@ -20,13 +31,12 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 
+            // Avoid duplicate validations from both Avalonia and the CommunityToolkit.
             // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
             DisableAvaloniaDataAnnotationValidation();
-            desktop.MainWindow = new MainWindow
-            {
-                DataContext = new MainWindowViewModel(),
-            };
+
+            desktop.MainWindow = new MainWindow();
+            // DataContext will be set later when MainViewModel is implemented
         }
 
         base.OnFrameworkInitializationCompleted();
