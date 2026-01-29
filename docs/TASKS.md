@@ -1037,24 +1037,24 @@ For a single developer or AI agent, here's the recommended order:
 1. ✅ TASK-101: Create Solution Structure
 2. ✅ TASK-102: Add NuGet Dependencies
 3. ✅ TASK-201: Implement Data Models
-4. ⬜ TASK-202: Implement PlatformInfo
-5. ⬜ TASK-203: Implement ConfigService
-6. ⬜ TASK-103: Create Base Avalonia App
+4. ✅ TASK-202: Implement PlatformInfo
+5. ✅ TASK-203: Implement ConfigService
+6. ✅ TASK-103: Create Base Avalonia App
 
 ### Sprint 2: Platform Layer (Start with your dev platform)
-7. ⬜ TASK-301: Define Platform Interfaces
-8. ⬜ TASK-302/303/304: Implement YOUR platform providers
-9. ⬜ TASK-305: Implement PlatformServices Registration
+7. ✅ TASK-301: Define Platform Interfaces
+8. ✅ TASK-302/303/304: Implement YOUR platform providers
+9. ✅ TASK-305: Implement PlatformServices Registration
 
 ### Sprint 3: Core Services
-10. ⬜ TASK-401: Implement AppStateManager
-11. ⬜ TASK-402: Implement HotkeyService
-12. ⬜ TASK-403: Implement AudioService
-13. ⬜ TASK-404: Implement ModelManager
-14. ⬜ TASK-405: Implement TranscriptionService
-15. ⬜ TASK-406: Implement ClipboardService
-16. ⬜ TASK-407: Implement OutputService
-17. ⬜ TASK-408: Implement NotificationService
+10. ✅ TASK-401: Implement AppStateManager
+11. ✅ TASK-402: Implement HotkeyService
+12. ✅ TASK-403: Implement AudioService
+13. ✅ TASK-404: Implement ModelManager
+14. ✅ TASK-405: Implement TranscriptionService
+15. ✅ TASK-406: Implement ClipboardService
+16. ✅ TASK-407: Implement OutputService
+17. ✅ TASK-408: Implement NotificationService
 
 ### Sprint 4: UI & Integration
 18. ⬜ TASK-501: Create Tray Icon & Context Menu
@@ -1063,7 +1063,7 @@ For a single developer or AI agent, here's the recommended order:
 21. ⬜ TASK-601: Implement First-Run Experience
 
 ### Sprint 5: Other Platforms
-22. ⬜ TASK-302/303/304: Implement remaining platform providers
+22. ✅ TASK-302/303/304: Implement remaining platform providers
 
 ### Sprint 6: Polish & Release
 23. ⬜ TASK-503: Create Recording Overlay (Optional)
