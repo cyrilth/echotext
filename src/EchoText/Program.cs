@@ -46,6 +46,7 @@ sealed class Program
         services.AddSingleton<ITranscriptionService, TranscriptionService>();
         services.AddSingleton<IClipboardService, ClipboardService>();
         services.AddSingleton<IOutputService, OutputService>();
+        services.AddSingleton<INotificationService, NotificationService>();
 
         // TODO: Register remaining core services here as they are implemented in later tasks
 

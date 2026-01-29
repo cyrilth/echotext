@@ -604,7 +604,7 @@ Implement text output service (clipboard + auto-type).
 | **ID** | TASK-408 |
 | **Complexity** | 🟡 Medium |
 | **Dependencies** | TASK-103 |
-| **Status** | ⬜ Not Started |
+| **Status** | ✅ Complete |
 
 **Description:**
 Implement notifications and sound effects.
@@ -618,11 +618,11 @@ Implement notifications and sound effects.
 6. `Assets/Sounds/error.wav`
 
 **Acceptance Criteria:**
-- [ ] Shows toast notifications
-- [ ] Plays sound effects
-- [ ] Respects "show notifications" setting
-- [ ] Respects "play sounds" setting
-- [ ] Works on all platforms
+- [x] Shows toast notifications
+- [x] Plays sound effects
+- [x] Respects "show notifications" setting
+- [x] Respects "play sounds" setting
+- [x] Works on all platforms
 
 ---
 
