@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Platform;
+using Avalonia.Threading;
 using EchoText.ViewModels;
 using System;
 
@@ -30,6 +31,9 @@ public partial class MainWindow : Window
 
         // Subscribe to property changes for icon updates
         _viewModel.PropertyChanged += ViewModel_PropertyChanged;
+
+        // Hide the window on startup - this is a tray-only application
+        Loaded += (_, _) => Hide();
     }
 
     private void InitializeTrayIcon()
@@ -87,18 +91,22 @@ public partial class MainWindow : Window
     {
         if (_viewModel == null || _trayIcon == null) return;
 
-        if (e.PropertyName == nameof(MainViewModel.TrayIconPath))
+        // Marshal UI updates to the UI thread
+        Dispatcher.UIThread.Post(() =>
         {
-            UpdateTrayIcon(_viewModel.TrayIconPath);
-        }
-        else if (e.PropertyName == nameof(MainViewModel.StatusText))
-        {
-            // Update status menu item text
-            if (_statusMenuItem != null)
+            if (e.PropertyName == nameof(MainViewModel.TrayIconPath))
             {
-                _statusMenuItem.Header = _viewModel.StatusText;
+                UpdateTrayIcon(_viewModel.TrayIconPath);
             }
-        }
+            else if (e.PropertyName == nameof(MainViewModel.StatusText))
+            {
+                // Update status menu item text
+                if (_statusMenuItem != null)
+                {
+                    _statusMenuItem.Header = _viewModel.StatusText;
+                }
+            }
+        });
     }
 
     private void UpdateTrayIcon(string iconPath)

@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Threading;
 using EchoText.Services.Interfaces;
 using EchoText.ViewModels;
 using EchoText.Views;
@@ -31,47 +32,61 @@ public sealed class WindowService : IWindowService
     /// <inheritdoc />
     public void ShowSettingsWindow()
     {
-        // If settings window is already open, bring it to front
-        if (_settingsWindow != null)
+        // Must run on UI thread since we're creating/showing a window
+        Dispatcher.UIThread.Post(() =>
         {
-            _settingsWindow.Activate();
-            return;
-        }
+            // If settings window is already open, bring it to front
+            if (_settingsWindow != null)
+            {
+                _settingsWindow.Activate();
+                return;
+            }
 
-        // Create new settings window with ViewModel from DI
-        var viewModel = _serviceProvider.GetRequiredService<SettingsViewModel>();
-        _settingsWindow = new SettingsWindow(viewModel);
+            // Create new settings window with ViewModel from DI
+            var viewModel = _serviceProvider.GetRequiredService<SettingsViewModel>();
+            _settingsWindow = new SettingsWindow(viewModel);
 
-        // Handle window closed to clear reference
-        _settingsWindow.Closed += (sender, args) =>
-        {
-            _settingsWindow = null;
-        };
+            // Handle window closed to clear reference
+            _settingsWindow.Closed += (sender, args) =>
+            {
+                _settingsWindow = null;
+            };
 
-        _settingsWindow.Show();
+            _settingsWindow.Show();
+        });
     }
 
     /// <inheritdoc />
     public void ShowRecordingOverlay()
     {
-        // Close any existing overlay first
-        HideRecordingOverlay();
-
-        // Create new recording overlay with ViewModel from DI
-        var viewModel = _serviceProvider.GetRequiredService<RecordingOverlayViewModel>();
-        _recordingOverlay = new RecordingOverlay(viewModel);
-
-        // Handle window closed to clear reference
-        _recordingOverlay.Closed += (sender, args) =>
+        // Must run on UI thread since we're creating/showing a window
+        Dispatcher.UIThread.Post(() =>
         {
-            _recordingOverlay = null;
-        };
+            // Close any existing overlay first
+            HideRecordingOverlayInternal();
 
-        _recordingOverlay.Show();
+            // Create new recording overlay with ViewModel from DI
+            var viewModel = _serviceProvider.GetRequiredService<RecordingOverlayViewModel>();
+            _recordingOverlay = new RecordingOverlay(viewModel);
+
+            // Handle window closed to clear reference
+            _recordingOverlay.Closed += (sender, args) =>
+            {
+                _recordingOverlay = null;
+            };
+
+            _recordingOverlay.Show();
+        });
     }
 
     /// <inheritdoc />
     public void HideRecordingOverlay()
+    {
+        // Must run on UI thread since we're closing a window
+        Dispatcher.UIThread.Post(HideRecordingOverlayInternal);
+    }
+
+    private void HideRecordingOverlayInternal()
     {
         if (_recordingOverlay != null)
         {

@@ -1,6 +1,7 @@
 using System;
 using EchoText.Models;
 using EchoText.Platform.Interfaces;
+using Microsoft.Extensions.Logging;
 using SharpHook;
 using SharpHook.Native;
 
@@ -12,6 +13,7 @@ namespace EchoText.Platform.Windows;
 public class WindowsHotkeyProvider : IPlatformHotkey
 {
     private readonly SimpleGlobalHook _hook;
+    private readonly ILogger<WindowsHotkeyProvider> _logger;
     private KeyModifiers _registeredModifiers;
     private string _registeredKey;
     private bool _isRegistered;
@@ -23,13 +25,15 @@ public class WindowsHotkeyProvider : IPlatformHotkey
 
     public bool IsRegistered => _isRegistered;
 
-    public WindowsHotkeyProvider()
+    public WindowsHotkeyProvider(ILogger<WindowsHotkeyProvider> logger)
     {
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _hook = new SimpleGlobalHook();
         _hook.KeyPressed += OnKeyPressed;
         _hook.KeyReleased += OnKeyReleased;
         _registeredModifiers = KeyModifiers.None;
         _registeredKey = string.Empty;
+        _logger.LogInformation("WindowsHotkeyProvider initialized");
     }
 
     public bool Register(KeyModifiers modifiers, string key)
@@ -49,16 +53,21 @@ public class WindowsHotkeyProvider : IPlatformHotkey
             _registeredKey = key;
             _isRegistered = true;
 
+            _logger.LogInformation("Registering hotkey: {Modifiers}+{Key}", modifiers, key);
+
             // Start the hook if not already running
             if (!_hook.IsRunning)
             {
+                _logger.LogInformation("Starting global keyboard hook");
                 _hook.RunAsync();
             }
 
+            _logger.LogInformation("Hotkey registered successfully, hook running: {IsRunning}", _hook.IsRunning);
             return true;
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Failed to register hotkey");
             _isRegistered = false;
             return false;
         }
@@ -80,8 +89,15 @@ public class WindowsHotkeyProvider : IPlatformHotkey
         if (!_isRegistered || _isPressed)
             return;
 
+        var keyString = MapSharpHookKeyToString(e.Data.KeyCode);
+        var currentModifiers = GetCurrentModifiers(e);
+
+        _logger.LogDebug("Key pressed: {Key}, modifiers: {Modifiers}, registered: {RegKey}+{RegMod}",
+            keyString, currentModifiers, _registeredKey, _registeredModifiers);
+
         if (IsHotkeyMatch(e))
         {
+            _logger.LogInformation("Hotkey match detected - firing HotkeyPressed event");
             _isPressed = true;
             HotkeyPressed?.Invoke(this, EventArgs.Empty);
         }
@@ -94,6 +110,7 @@ public class WindowsHotkeyProvider : IPlatformHotkey
 
         if (IsHotkeyMatch(e))
         {
+            _logger.LogInformation("Hotkey released - firing HotkeyReleased event");
             _isPressed = false;
             HotkeyReleased?.Invoke(this, EventArgs.Empty);
         }
@@ -115,46 +132,31 @@ public class WindowsHotkeyProvider : IPlatformHotkey
     {
         var modifiers = KeyModifiers.None;
 
-        var rawModifiers = e.Data.RawCode;
+        // Use the RawEvent.Mask which contains the modifier state at the time of key press
+        var mask = e.RawEvent.Mask;
 
-        // Check for Ctrl
-        if ((rawModifiers & (ushort)ModifierMask.LeftCtrl) != 0 ||
-            (rawModifiers & (ushort)ModifierMask.RightCtrl) != 0 ||
-            e.Data.KeyCode == KeyCode.VcLeftControl ||
-            e.Data.KeyCode == KeyCode.VcRightControl)
+        // Check for Ctrl (left or right)
+        if ((mask & ModifierMask.LeftCtrl) != 0 || (mask & ModifierMask.RightCtrl) != 0)
         {
-            if ((_registeredModifiers & KeyModifiers.Ctrl) != 0)
-                modifiers |= KeyModifiers.Ctrl;
+            modifiers |= KeyModifiers.Ctrl;
         }
 
-        // Check for Shift
-        if ((rawModifiers & (ushort)ModifierMask.LeftShift) != 0 ||
-            (rawModifiers & (ushort)ModifierMask.RightShift) != 0 ||
-            e.Data.KeyCode == KeyCode.VcLeftShift ||
-            e.Data.KeyCode == KeyCode.VcRightShift)
+        // Check for Shift (left or right)
+        if ((mask & ModifierMask.LeftShift) != 0 || (mask & ModifierMask.RightShift) != 0)
         {
-            if ((_registeredModifiers & KeyModifiers.Shift) != 0)
-                modifiers |= KeyModifiers.Shift;
+            modifiers |= KeyModifiers.Shift;
         }
 
-        // Check for Alt
-        if ((rawModifiers & (ushort)ModifierMask.LeftAlt) != 0 ||
-            (rawModifiers & (ushort)ModifierMask.RightAlt) != 0 ||
-            e.Data.KeyCode == KeyCode.VcLeftAlt ||
-            e.Data.KeyCode == KeyCode.VcRightAlt)
+        // Check for Alt (left or right)
+        if ((mask & ModifierMask.LeftAlt) != 0 || (mask & ModifierMask.RightAlt) != 0)
         {
-            if ((_registeredModifiers & KeyModifiers.Alt) != 0)
-                modifiers |= KeyModifiers.Alt;
+            modifiers |= KeyModifiers.Alt;
         }
 
-        // Check for Meta (Windows key)
-        if ((rawModifiers & (ushort)ModifierMask.LeftMeta) != 0 ||
-            (rawModifiers & (ushort)ModifierMask.RightMeta) != 0 ||
-            e.Data.KeyCode == KeyCode.VcLeftMeta ||
-            e.Data.KeyCode == KeyCode.VcRightMeta)
+        // Check for Meta/Windows key (left or right)
+        if ((mask & ModifierMask.LeftMeta) != 0 || (mask & ModifierMask.RightMeta) != 0)
         {
-            if ((_registeredModifiers & KeyModifiers.Meta) != 0)
-                modifiers |= KeyModifiers.Meta;
+            modifiers |= KeyModifiers.Meta;
         }
 
         return modifiers;

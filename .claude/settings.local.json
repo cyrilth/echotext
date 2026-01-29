@@ -30,7 +30,22 @@
       "Bash(findstr:*)",
       "Bash(del nul)",
       "Bash(cd /d D:sourcespersonal_reposechotext)",
-      "Bash(dotnet run:*)"
+      "Bash(dotnet run:*)",
+      "Bash(timeout:*)",
+      "Bash(tasklist:*)",
+      "Bash(ping:*)",
+      "Bash(powershell -Command \"Start-Sleep -Seconds 5; Get-Content ''C:\\\\Users\\\\dev\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\D--sources-personal-repos-echotext\\\\tasks\\\\ba19168.output''\")",
+      "Bash(powershell:*)",
+      "Bash(cmd /c \"mkdir %APPDATA%\\\\EchoText\\\\models 2>nul && echo Created || echo Failed - maybe already exists\")",
+      "Bash(cmd /c \"if exist %APPDATA%\\\\EchoText\\\\models \\(echo Directory exists\\) else \\(mkdir %APPDATA%\\\\EchoText\\\\models && echo Created directory\\)\")",
+      "Bash(exit 0)",
+      "Bash(dotnet list:*)",
+      "Bash(find:*)",
+      "Bash(cat:*)",
+      "Bash(Get-ChildItem \"$env:APPDATA\\\\EchoText\\\\logs\" -Filter \"*.log\")",
+      "Bash(Sort-Object LastWriteTime -Descending)",
+      "Bash(Select-Object -First 1)",
+      "Bash(Get-Content -Tail 50)"
     ],
     "deny": [],
     "ask": []
