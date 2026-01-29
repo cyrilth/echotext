@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -127,7 +128,31 @@ public partial class MainViewModel : ViewModelBase
             // Load configuration
             await _configService.LoadAsync();
 
-            // Load the model
+            // Check if this is the first run (no models downloaded)
+            var availableModels = await _modelManager.GetAvailableModelsAsync();
+            var hasDownloadedModel = availableModels.Any(m => m.IsDownloaded);
+
+            if (!hasDownloadedModel)
+            {
+                // Show first-run dialog
+                var modelDownloaded = await _windowService.ShowFirstRunDialogAsync();
+
+                if (!modelDownloaded)
+                {
+                    // User skipped - show warning notification
+                    await _notificationService.ShowNotificationAsync(
+                        "No Model Downloaded",
+                        "You'll need to download a model in Settings before you can use speech recognition.",
+                        NotificationType.Warning);
+                }
+                else
+                {
+                    // Reload available models after download
+                    availableModels = await _modelManager.GetAvailableModelsAsync();
+                }
+            }
+
+            // Load the model if one is available
             var modelPath = _modelManager.GetModelPath(_configService.Settings.Recognition.ModelName);
             if (!string.IsNullOrEmpty(modelPath))
             {

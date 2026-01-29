@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+
 namespace EchoText.Services.Interfaces;
 
 /// <summary>
@@ -22,6 +24,12 @@ public interface IWindowService
     /// Hides and closes the recording overlay window.
     /// </summary>
     void HideRecordingOverlay();
+
+    /// <summary>
+    /// Shows the first-run dialog for downloading a Whisper model.
+    /// </summary>
+    /// <returns>True if a model was downloaded, false if the user skipped.</returns>
+    Task<bool> ShowFirstRunDialogAsync();
 
     /// <summary>
     /// Exits the application gracefully.

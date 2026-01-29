@@ -1,0 +1,119 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:EchoText.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="400"
+        x:Class="EchoText.Views.FirstRunDialog"
+        x:DataType="vm:FirstRunViewModel"
+        Title="Welcome to EchoText"
+        Width="500" Height="400"
+        WindowStartupLocation="CenterScreen"
+        CanResize="False"
+        Icon="/Assets/Icons/tray-idle.ico">
+
+    <Design.DataContext>
+        <vm:FirstRunViewModel/>
+    </Design.DataContext>
+
+    <Grid Margin="20" RowDefinitions="Auto,*,Auto">
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Spacing="10" Margin="0,0,0,20">
+            <TextBlock Text="Welcome to EchoText!"
+                       FontSize="24"
+                       FontWeight="Bold"
+                       HorizontalAlignment="Center"/>
+            <TextBlock Text="Your local speech-to-text assistant"
+                       FontSize="14"
+                       Foreground="Gray"
+                       HorizontalAlignment="Center"/>
+        </StackPanel>
+
+        <!-- Content -->
+        <StackPanel Grid.Row="1" Spacing="15">
+            <!-- Welcome Message -->
+            <TextBlock TextWrapping="Wrap"
+                       Text="EchoText converts your speech to text using OpenAI's Whisper model running locally on your computer. To get started, you'll need to download a speech recognition model."
+                       FontSize="13"/>
+
+            <!-- Model Selection -->
+            <StackPanel Spacing="8">
+                <TextBlock Text="Select a Model:" FontWeight="SemiBold"/>
+                <ComboBox ItemsSource="{Binding AvailableModels}"
+                         SelectedItem="{Binding SelectedModel}"
+                         IsEnabled="{Binding !IsDownloading}"
+                         HorizontalAlignment="Stretch">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBlock Text="{Binding DisplayName}"
+                                          FontWeight="SemiBold"/>
+                                <TextBlock Text="(Downloaded)"
+                                          Foreground="Green"
+                                          IsVisible="{Binding IsDownloaded}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+
+                <TextBlock TextWrapping="Wrap"
+                          FontSize="11"
+                          Foreground="Gray"
+                          Text="The 'base' model offers a good balance between speed and accuracy. You can download additional models later in Settings."/>
+            </StackPanel>
+
+            <!-- Progress Section -->
+            <StackPanel Spacing="8" IsVisible="{Binding IsDownloading}">
+                <TextBlock Text="Download Progress:" FontWeight="SemiBold"/>
+                <ProgressBar Value="{Binding DownloadProgress}"
+                            Minimum="0" Maximum="100"
+                            Height="20"/>
+                <TextBlock Text="{Binding DownloadProgress, StringFormat={}{0:F0}%}"
+                          HorizontalAlignment="Center"
+                          FontSize="12"
+                          Foreground="Gray"/>
+            </StackPanel>
+
+            <!-- Status Message -->
+            <TextBlock Text="{Binding StatusMessage}"
+                      FontSize="12"
+                      Foreground="Gray"
+                      TextWrapping="Wrap"
+                      HorizontalAlignment="Center"
+                      Margin="0,10,0,0"/>
+        </StackPanel>
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="2"
+                   Orientation="Horizontal"
+                   HorizontalAlignment="Right"
+                   Spacing="10"
+                   Margin="0,20,0,0">
+
+            <Button Content="Skip"
+                   Command="{Binding SkipCommand}"
+                   IsEnabled="{Binding !IsDownloading}"
+                   Width="100"
+                   Click="OnSkipClick"/>
+
+            <Button Content="Cancel"
+                   Command="{Binding CancelDownloadCommand}"
+                   IsVisible="{Binding IsDownloading}"
+                   Width="100"/>
+
+            <Button Content="Download"
+                   Command="{Binding DownloadModelCommand}"
+                   IsVisible="{Binding !IsDownloading}"
+                   Width="100"
+                   Classes="accent"/>
+
+            <Button Content="Close"
+                   IsVisible="{Binding !IsDownloading}"
+                   IsEnabled="{Binding SelectedModel.IsDownloaded}"
+                   Width="100"
+                   Classes="accent"
+                   Click="OnCloseClick"/>
+        </StackPanel>
+    </Grid>
+</Window>

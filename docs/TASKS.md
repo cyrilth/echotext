@@ -768,7 +768,7 @@ Wire up all services in MainViewModel to implement the core transcription workfl
 | **ID** | TASK-601 |
 | **Complexity** | 🟡 Medium |
 | **Dependencies** | TASK-504, TASK-404 |
-| **Status** | ⬜ Not Started |
+| **Status** | ✅ Complete |
 
 **Description:**
 Handle first-time launch gracefully.
@@ -781,11 +781,11 @@ Handle first-time launch gracefully.
 5. Ready to use
 
 **Acceptance Criteria:**
-- [ ] Detects first run correctly
-- [ ] Shows welcome message
-- [ ] Downloads default model (base)
-- [ ] Shows download progress
-- [ ] Transitions to ready state
+- [x] Detects first run correctly
+- [x] Shows welcome message
+- [x] Downloads default model (base)
+- [x] Shows download progress
+- [x] Transitions to ready state
 
 ---
 

@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using EchoText.Services.Interfaces;
@@ -80,11 +81,51 @@ public sealed class WindowService : IWindowService
     }
 
     /// <inheritdoc />
+    public async Task<bool> ShowFirstRunDialogAsync()
+    {
+        // Create ViewModel from DI
+        var viewModel = _serviceProvider.GetRequiredService<FirstRunViewModel>();
+        var dialog = new FirstRunDialog
+        {
+            DataContext = viewModel
+        };
+
+        // Show dialog and wait for result
+        var mainWindow = GetMainWindow();
+        if (mainWindow == null)
+        {
+            // If no main window, show as regular window instead of dialog
+            dialog.Show();
+            viewModel.Dispose();
+            return false;
+        }
+
+        var result = await dialog.ShowDialog<bool>(mainWindow);
+
+        // Dispose ViewModel
+        viewModel.Dispose();
+
+        return result;
+    }
+
+    /// <inheritdoc />
     public void ExitApplication()
     {
         if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.Shutdown();
         }
+    }
+
+    /// <summary>
+    /// Gets the main window of the application
+    /// </summary>
+    private Avalonia.Controls.Window? GetMainWindow()
+    {
+        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            return desktop.MainWindow;
+        }
+        return null;
     }
 }
