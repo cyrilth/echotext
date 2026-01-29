@@ -735,7 +735,7 @@ Create optional floating recording indicator.
 | **ID** | TASK-504 |
 | **Complexity** | 🔴 Complex |
 | **Dependencies** | TASK-401 through TASK-408, TASK-501 |
-| **Status** | ⬜ Not Started |
+| **Status** | ✅ Complete |
 
 **Description:**
 Wire up all services in MainViewModel to implement the core transcription workflow.
@@ -751,12 +751,12 @@ Wire up all services in MainViewModel to implement the core transcription workfl
 1. `ViewModels/MainViewModel.cs`
 
 **Acceptance Criteria:**
-- [ ] Push-to-talk works end-to-end
-- [ ] Toggle mode works end-to-end
-- [ ] State transitions correctly
-- [ ] Errors handled gracefully
-- [ ] Notifications shown at appropriate times
-- [ ] Sounds play at appropriate times
+- [x] Push-to-talk works end-to-end
+- [x] Toggle mode works end-to-end
+- [x] State transitions correctly
+- [x] Errors handled gracefully
+- [x] Notifications shown at appropriate times
+- [x] Sounds play at appropriate times
 
 ---
 
