@@ -2,6 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using EchoText.Platform;
+using EchoText.Services;
+using EchoText.Services.Interfaces;
 
 namespace EchoText;
 
@@ -35,7 +37,10 @@ sealed class Program
         // Register platform-specific services
         PlatformServices.Register(services);
 
-        // TODO: Register core services here as they are implemented in later tasks
+        // Register core services
+        services.AddSingleton<IAppStateManager, AppStateManager>();
+
+        // TODO: Register remaining core services here as they are implemented in later tasks
 
         return services.BuildServiceProvider();
     }
