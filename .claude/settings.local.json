@@ -29,7 +29,8 @@
       "Bash(xargs:*)",
       "Bash(findstr:*)",
       "Bash(del nul)",
-      "Bash(cd /d D:sourcespersonal_reposechotext)"
+      "Bash(cd /d D:sourcespersonal_reposechotext)",
+      "Bash(dotnet run:*)"
     ],
     "deny": [],
     "ask": []

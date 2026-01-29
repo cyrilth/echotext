@@ -520,7 +520,7 @@ large:  https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3.
 | **ID** | TASK-405 |
 | **Complexity** | 🟡 Medium |
 | **Dependencies** | TASK-404 |
-| **Status** | ⬜ Not Started |
+| **Status** | ✅ Complete |
 
 **Description:**
 Implement Whisper transcription service.
@@ -536,13 +536,13 @@ Implement Whisper transcription service.
 - Unload model on dispose
 
 **Acceptance Criteria:**
-- [ ] Loads model successfully
-- [ ] IsModelLoaded property is accurate
-- [ ] Transcribes English speech correctly
-- [ ] Auto-detect language works
-- [ ] Returns empty string for silence
-- [ ] Handles invalid audio gracefully
-- [ ] Unit tests pass (with mock)
+- [x] Loads model successfully
+- [x] IsModelLoaded property is accurate
+- [x] Transcribes English speech correctly
+- [x] Auto-detect language works
+- [x] Returns empty string for silence
+- [x] Handles invalid audio gracefully
+- [x] Unit tests pass (with mock)
 
 ---
 

@@ -43,6 +43,7 @@ sealed class Program
         services.AddSingleton<IHotkeyService, HotkeyService>();
         services.AddSingleton<IAudioService, AudioService>();
         services.AddSingleton<IModelManager, ModelManager>();
+        services.AddSingleton<ITranscriptionService, TranscriptionService>();
 
         // TODO: Register remaining core services here as they are implemented in later tasks
 
