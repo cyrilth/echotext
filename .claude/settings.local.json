@@ -28,7 +28,8 @@
       "Bash(tree:*)",
       "Bash(xargs:*)",
       "Bash(findstr:*)",
-      "Bash(del nul)"
+      "Bash(del nul)",
+      "Bash(cd /d D:sourcespersonal_reposechotext)"
     ],
     "deny": [],
     "ask": []

@@ -479,7 +479,7 @@ Implement audio capture service.
 | **ID** | TASK-404 |
 | **Complexity** | 🟡 Medium |
 | **Dependencies** | TASK-202 |
-| **Status** | ⬜ Not Started |
+| **Status** | ✅ Complete |
 
 **Description:**
 Implement Whisper model download and management.
@@ -504,13 +504,13 @@ large:  https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3.
 - Delete downloaded model
 
 **Acceptance Criteria:**
-- [ ] Lists all model options
-- [ ] Correctly identifies downloaded models
-- [ ] Downloads model with progress callback
-- [ ] Handles download interruption gracefully
-- [ ] Returns correct model paths
-- [ ] Can delete models
-- [ ] Unit tests pass
+- [x] Lists all model options
+- [x] Correctly identifies downloaded models
+- [x] Downloads model with progress callback
+- [x] Handles download interruption gracefully
+- [x] Returns correct model paths
+- [x] Can delete models
+- [x] Unit tests pass
 
 ---
 
