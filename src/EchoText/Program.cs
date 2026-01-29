@@ -48,6 +48,7 @@ sealed class Program
         services.AddSingleton<IOutputService, OutputService>();
         services.AddSingleton<INotificationService, NotificationService>();
         services.AddSingleton<IWindowService, WindowService>();
+        services.AddSingleton<IUpdateService, UpdateService>();
 
         // Register ViewModels
         services.AddSingleton<ViewModels.MainViewModel>();

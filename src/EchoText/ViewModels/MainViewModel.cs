@@ -23,6 +23,7 @@ public partial class MainViewModel : ViewModelBase
     private readonly INotificationService _notificationService;
     private readonly IConfigService _configService;
     private readonly IModelManager _modelManager;
+    private readonly IUpdateService _updateService;
 
     [ObservableProperty]
     private string _statusText = "Idle";
@@ -42,6 +43,7 @@ public partial class MainViewModel : ViewModelBase
     /// <param name="notificationService">Notification service for toast and sounds</param>
     /// <param name="configService">Configuration service for settings</param>
     /// <param name="modelManager">Model manager for Whisper models</param>
+    /// <param name="updateService">Update service for checking GitHub releases</param>
     public MainViewModel(
         IAppStateManager appStateManager,
         IWindowService windowService,
@@ -51,7 +53,8 @@ public partial class MainViewModel : ViewModelBase
         IOutputService outputService,
         INotificationService notificationService,
         IConfigService configService,
-        IModelManager modelManager)
+        IModelManager modelManager,
+        IUpdateService updateService)
     {
         _appStateManager = appStateManager ?? throw new ArgumentNullException(nameof(appStateManager));
         _windowService = windowService ?? throw new ArgumentNullException(nameof(windowService));
@@ -62,6 +65,7 @@ public partial class MainViewModel : ViewModelBase
         _notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
         _configService = configService ?? throw new ArgumentNullException(nameof(configService));
         _modelManager = modelManager ?? throw new ArgumentNullException(nameof(modelManager));
+        _updateService = updateService ?? throw new ArgumentNullException(nameof(updateService));
 
         // Subscribe to state changes
         _appStateManager.StateChanged += OnAppStateChanged;
@@ -90,10 +94,44 @@ public partial class MainViewModel : ViewModelBase
     /// Command to check for updates
     /// </summary>
     [RelayCommand]
-    private void CheckForUpdates()
+    private async Task CheckForUpdates()
     {
-        // TODO: Implement in TASK-602
-        // Check for application updates
+        try
+        {
+            await _notificationService.ShowNotificationAsync(
+                "Checking for Updates",
+                "Checking GitHub for the latest version...",
+                NotificationType.Info);
+
+            var result = await _updateService.CheckForUpdatesAsync();
+
+            if (result.UpdateAvailable)
+            {
+                // Update available - show notification with action
+                await _notificationService.ShowNotificationAsync(
+                    "Update Available",
+                    $"A new version ({result.LatestVersion}) is available! Click to download.",
+                    NotificationType.Success);
+
+                // Open releases page
+                _updateService.OpenReleasesPage();
+            }
+            else
+            {
+                // Already up to date
+                await _notificationService.ShowNotificationAsync(
+                    "No Updates",
+                    $"You're running the latest version ({result.CurrentVersion}).",
+                    NotificationType.Info);
+            }
+        }
+        catch (Exception ex)
+        {
+            await _notificationService.ShowNotificationAsync(
+                "Update Check Failed",
+                $"Failed to check for updates: {ex.Message}",
+                NotificationType.Error);
+        }
     }
 
     /// <summary>
@@ -114,6 +152,33 @@ public partial class MainViewModel : ViewModelBase
     {
         // Request application shutdown via WindowService
         _windowService.ExitApplication();
+    }
+
+    /// <summary>
+    /// Checks for updates on startup (silently, only shows notification if update available)
+    /// </summary>
+    private async Task CheckForUpdatesOnStartupAsync()
+    {
+        try
+        {
+            // Wait a bit before checking to not interfere with startup
+            await Task.Delay(TimeSpan.FromSeconds(3));
+
+            var result = await _updateService.CheckForUpdatesAsync();
+
+            // Only show notification if an update is available
+            if (result.UpdateAvailable)
+            {
+                await _notificationService.ShowNotificationAsync(
+                    "Update Available",
+                    $"A new version ({result.LatestVersion}) is available! Check the tray menu to download.",
+                    NotificationType.Info);
+            }
+        }
+        catch
+        {
+            // Silently fail - don't bother user with update check errors on startup
+        }
     }
 
     /// <summary>
@@ -178,6 +243,12 @@ public partial class MainViewModel : ViewModelBase
 
             // Transition to idle
             _appStateManager.TransitionTo(AppState.Idle);
+
+            // Check for updates on startup if enabled in settings
+            if (_configService.Settings.General.CheckForUpdates)
+            {
+                _ = CheckForUpdatesOnStartupAsync();
+            }
         }
         catch (Exception ex)
         {

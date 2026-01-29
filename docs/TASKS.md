@@ -795,7 +795,7 @@ Handle first-time launch gracefully.
 | **ID** | TASK-602 |
 | **Complexity** | 🟡 Medium |
 | **Dependencies** | TASK-501 |
-| **Status** | ⬜ Not Started |
+| **Status** | ✅ Complete |
 
 **Description:**
 Check GitHub releases for updates.
@@ -805,11 +805,11 @@ Check GitHub releases for updates.
 2. `Services/UpdateService.cs`
 
 **Acceptance Criteria:**
-- [ ] Checks GitHub API for latest release
-- [ ] Compares version numbers correctly
-- [ ] Shows notification if update available
-- [ ] Opens GitHub releases page on click
-- [ ] Respects "check for updates" setting
+- [x] Checks GitHub API for latest release
+- [x] Compares version numbers correctly
+- [x] Shows notification if update available
+- [x] Opens GitHub releases page on click
+- [x] Respects "check for updates" setting
 
 ---
 
