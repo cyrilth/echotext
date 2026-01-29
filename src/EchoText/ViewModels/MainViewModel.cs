@@ -111,8 +111,8 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void ExitApplication()
     {
-        // Request application shutdown
-        System.Environment.Exit(0);
+        // Request application shutdown via WindowService
+        _windowService.ExitApplication();
     }
 
     /// <summary>
@@ -378,5 +378,20 @@ public partial class MainViewModel : ViewModelBase
                 TrayIconPath = "avares://EchoText/Assets/Icons/tray-idle.ico";
                 break;
         }
+    }
+
+    /// <summary>
+    /// Disposes resources and unsubscribes from events
+    /// </summary>
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            // Unsubscribe from events to prevent memory leaks
+            _appStateManager.StateChanged -= OnAppStateChanged;
+            _hotkeyService.HotkeyPressed -= OnHotkeyPressed;
+            _hotkeyService.HotkeyReleased -= OnHotkeyReleased;
+        }
+        base.Dispose(disposing);
     }
 }

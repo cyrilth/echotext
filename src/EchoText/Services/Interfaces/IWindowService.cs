@@ -22,4 +22,9 @@ public interface IWindowService
     /// Hides and closes the recording overlay window.
     /// </summary>
     void HideRecordingOverlay();
+
+    /// <summary>
+    /// Exits the application gracefully.
+    /// </summary>
+    void ExitApplication();
 }

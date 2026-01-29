@@ -1,4 +1,6 @@
 using System;
+using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
 using EchoText.Services.Interfaces;
 using EchoText.ViewModels;
 using EchoText.Views;
@@ -74,6 +76,15 @@ public sealed class WindowService : IWindowService
         {
             _recordingOverlay.Close();
             _recordingOverlay = null;
+        }
+    }
+
+    /// <inheritdoc />
+    public void ExitApplication()
+    {
+        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            desktop.Shutdown();
         }
     }
 }
