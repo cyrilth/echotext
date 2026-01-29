@@ -1,0 +1,169 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  PROJECT_PATH: 'src/EchoText/EchoText.csproj'
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      version: ${{ steps.get_version.outputs.version }}
+    steps:
+      - name: Get version from tag
+        id: get_version
+        run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: EchoText ${{ steps.get_version.outputs.version }}
+          draft: false
+          prerelease: false
+          body: |
+            ## EchoText v${{ steps.get_version.outputs.version }}
+
+            ### Installation
+
+            Download the appropriate file for your platform:
+            - **Windows**: `EchoText-${{ steps.get_version.outputs.version }}-win-x64.zip`
+            - **Linux**: `EchoText-${{ steps.get_version.outputs.version }}-linux-x64.tar.gz`
+            - **macOS (Intel)**: `EchoText-${{ steps.get_version.outputs.version }}-osx-x64.tar.gz`
+            - **macOS (Apple Silicon)**: `EchoText-${{ steps.get_version.outputs.version }}-osx-arm64.tar.gz`
+
+            ### Verification
+
+            Verify your download using the checksums in `checksums.txt`.
+
+            ### Changes
+
+            See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for details.
+
+            ---
+
+            **Note**: This is a local-first application. Your data never leaves your machine.
+
+  build-release:
+    name: Build - ${{ matrix.name }}
+    needs: create-release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Windows x64
+            os: windows-latest
+            rid: win-x64
+            artifact_name: EchoText-${{ needs.create-release.outputs.version }}-win-x64.zip
+            archive_cmd: 7z a -tzip
+
+          - name: Linux x64
+            os: ubuntu-latest
+            rid: linux-x64
+            artifact_name: EchoText-${{ needs.create-release.outputs.version }}-linux-x64.tar.gz
+            archive_cmd: tar czf
+
+          - name: macOS x64
+            os: macos-latest
+            rid: osx-x64
+            artifact_name: EchoText-${{ needs.create-release.outputs.version }}-osx-x64.tar.gz
+            archive_cmd: tar czf
+
+          - name: macOS ARM64
+            os: macos-latest
+            rid: osx-arm64
+            artifact_name: EchoText-${{ needs.create-release.outputs.version }}-osx-arm64.tar.gz
+            archive_cmd: tar czf
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Publish Release
+        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -r ${{ matrix.rid }} --self-contained -p:PublishSingleFile=true -p:PublishTrimmed=true -o ./publish/${{ matrix.rid }}
+
+      - name: Create archive (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          cd publish/${{ matrix.rid }}
+          7z a -tzip ../../${{ matrix.artifact_name }} *
+
+      - name: Create archive (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: |
+          cd publish/${{ matrix.rid }}
+          tar czf ../../${{ matrix.artifact_name }} *
+
+      - name: Generate checksum (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          $hash = (Get-FileHash -Algorithm SHA256 ${{ matrix.artifact_name }}).Hash
+          "$hash  ${{ matrix.artifact_name }}" | Out-File -Append checksums.txt
+
+      - name: Generate checksum (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: |
+          shasum -a 256 ${{ matrix.artifact_name }} >> checksums.txt
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./${{ matrix.artifact_name }}
+          asset_name: ${{ matrix.artifact_name }}
+          asset_content_type: application/octet-stream
+
+      - name: Upload checksums
+        uses: actions/upload-artifact@v4
+        with:
+          name: checksums-${{ matrix.rid }}
+          path: checksums.txt
+          retention-days: 1
+
+  upload-checksums:
+    name: Upload Checksums
+    needs: [create-release, build-release]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all checksums
+        uses: actions/download-artifact@v4
+        with:
+          pattern: checksums-*
+          merge-multiple: false
+
+      - name: Combine checksums
+        run: |
+          cat checksums-*/checksums.txt > checksums.txt
+          echo "Combined checksums:"
+          cat checksums.txt
+
+      - name: Upload checksums to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./checksums.txt
+          asset_name: checksums.txt
+          asset_content_type: text/plain

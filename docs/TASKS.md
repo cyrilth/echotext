@@ -902,7 +902,7 @@ Set up continuous integration workflow.
 | **ID** | TASK-702 |
 | **Complexity** | 🟡 Medium |
 | **Dependencies** | TASK-701 |
-| **Status** | ⬜ Not Started |
+| **Status** | ✅ Complete |
 
 **Description:**
 Set up release automation.
@@ -926,10 +926,10 @@ Set up release automation.
 - `checksums.txt`
 
 **Acceptance Criteria:**
-- [ ] Release created on tag push
-- [ ] All artifacts uploaded
-- [ ] Checksums generated
-- [ ] Release notes template applied
+- [x] Release created on tag push
+- [x] All artifacts uploaded
+- [x] Checksums generated
+- [x] Release notes template applied
 
 ---
 
@@ -1072,8 +1072,8 @@ For a single developer or AI agent, here's the recommended order:
 26. ✅ TASK-604: Add Logging
 
 ### Sprint 7: Build & Distribution
-27. ⬜ TASK-701: Create GitHub Actions CI
-28. ⬜ TASK-702: Create GitHub Actions Release
+27. ✅ TASK-701: Create GitHub Actions CI
+28. ✅ TASK-702: Create GitHub Actions Release
 29. ⬜ TASK-703: Create README
 30. ⬜ TASK-704: Create Additional Documentation
 
