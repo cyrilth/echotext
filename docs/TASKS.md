@@ -819,7 +819,7 @@ Check GitHub releases for updates.
 | **ID** | TASK-603 |
 | **Complexity** | 🟡 Medium |
 | **Dependencies** | All services |
-| **Status** | ⬜ Not Started |
+| **Status** | ✅ Complete |
 
 **Description:**
 Write comprehensive unit tests for all services.
@@ -832,10 +832,10 @@ Write comprehensive unit tests for all services.
 5. `EchoText.Tests/ViewModels/SettingsViewModelTests.cs`
 
 **Acceptance Criteria:**
-- [ ] >80% code coverage on services
-- [ ] All state transitions tested
-- [ ] Error conditions tested
-- [ ] All tests pass
+- [x] >80% code coverage on services
+- [x] All state transitions tested
+- [x] Error conditions tested
+- [x] All tests pass
 
 ---
 
