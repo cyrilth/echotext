@@ -705,7 +705,7 @@ Implement settings window UI.
 | **ID** | TASK-503 |
 | **Complexity** | 🟡 Medium |
 | **Dependencies** | TASK-401, TASK-403 |
-| **Status** | ⬜ Not Started |
+| **Status** | ✅ Complete |
 
 **Description:**
 Create optional floating recording indicator.
@@ -720,12 +720,12 @@ Create optional floating recording indicator.
 - Cancel button
 
 **Acceptance Criteria:**
-- [ ] Appears when recording starts
-- [ ] Disappears when recording stops
-- [ ] Shows recording duration
-- [ ] Shows audio level
-- [ ] Cancel button stops recording
-- [ ] Always on top
+- [x] Appears when recording starts
+- [x] Disappears when recording stops
+- [x] Shows recording duration
+- [x] Shows audio level
+- [x] Cancel button stops recording
+- [x] Always on top
 
 ---
 

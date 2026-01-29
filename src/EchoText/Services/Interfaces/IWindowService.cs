@@ -11,4 +11,15 @@ public interface IWindowService
     /// If the window is already open, brings it to front instead of creating a new instance.
     /// </summary>
     void ShowSettingsWindow();
+
+    /// <summary>
+    /// Shows the recording overlay window.
+    /// Creates a new instance each time recording starts.
+    /// </summary>
+    void ShowRecordingOverlay();
+
+    /// <summary>
+    /// Hides and closes the recording overlay window.
+    /// </summary>
+    void HideRecordingOverlay();
 }

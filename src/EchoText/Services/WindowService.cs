@@ -14,6 +14,7 @@ public sealed class WindowService : IWindowService
 {
     private readonly IServiceProvider _serviceProvider;
     private SettingsWindow? _settingsWindow;
+    private RecordingOverlay? _recordingOverlay;
 
     /// <summary>
     /// Initializes a new instance of the WindowService.
@@ -45,5 +46,34 @@ public sealed class WindowService : IWindowService
         };
 
         _settingsWindow.Show();
+    }
+
+    /// <inheritdoc />
+    public void ShowRecordingOverlay()
+    {
+        // Close any existing overlay first
+        HideRecordingOverlay();
+
+        // Create new recording overlay with ViewModel from DI
+        var viewModel = _serviceProvider.GetRequiredService<RecordingOverlayViewModel>();
+        _recordingOverlay = new RecordingOverlay(viewModel);
+
+        // Handle window closed to clear reference
+        _recordingOverlay.Closed += (sender, args) =>
+        {
+            _recordingOverlay = null;
+        };
+
+        _recordingOverlay.Show();
+    }
+
+    /// <inheritdoc />
+    public void HideRecordingOverlay()
+    {
+        if (_recordingOverlay != null)
+        {
+            _recordingOverlay.Close();
+            _recordingOverlay = null;
+        }
     }
 }

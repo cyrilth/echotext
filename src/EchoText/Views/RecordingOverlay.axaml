@@ -1,0 +1,84 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:EchoText.ViewModels"
+        xmlns:views="using:EchoText.Views"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="280" d:DesignHeight="120"
+        x:Class="EchoText.Views.RecordingOverlay"
+        x:DataType="vm:RecordingOverlayViewModel"
+        Title="Recording"
+        Width="280" Height="120"
+        CanResize="False"
+        WindowStartupLocation="CenterScreen"
+        SystemDecorations="BorderOnly"
+        Topmost="True"
+        ShowInTaskbar="False"
+        TransparencyLevelHint="Transparent"
+        Background="#F0F0F0">
+
+    <Design.DataContext>
+        <vm:RecordingOverlayViewModel/>
+    </Design.DataContext>
+
+    <Border BorderBrush="#CCCCCC"
+            BorderThickness="1"
+            CornerRadius="8"
+            Background="White"
+            Margin="4"
+            Padding="15">
+        <StackPanel Spacing="12">
+
+            <!-- Title and Duration -->
+            <Grid ColumnDefinitions="Auto,*">
+                <TextBlock Grid.Column="0"
+                           Text="Recording"
+                           FontSize="14"
+                           FontWeight="SemiBold"
+                           VerticalAlignment="Center"
+                           Margin="0,0,10,0"/>
+
+                <TextBlock Grid.Column="1"
+                           Text="{Binding RecordingDuration}"
+                           FontSize="18"
+                           FontWeight="Bold"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Center"
+                           Foreground="#D32F2F"/>
+            </Grid>
+
+            <!-- Audio Level Meter -->
+            <StackPanel Spacing="5">
+                <TextBlock Text="Audio Level"
+                           FontSize="11"
+                           Foreground="#666666"/>
+
+                <Border Height="12"
+                        Background="#E0E0E0"
+                        CornerRadius="6"
+                        ClipToBounds="True">
+                    <Border Width="{Binding AudioLevel, Converter={x:Static views:PercentageToWidthConverter.Instance}}"
+                            Height="12"
+                            HorizontalAlignment="Left"
+                            CornerRadius="6">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0%,50%" EndPoint="100%,50%">
+                                <GradientStop Color="#4CAF50" Offset="0"/>
+                                <GradientStop Color="#8BC34A" Offset="0.5"/>
+                                <GradientStop Color="#FFC107" Offset="0.7"/>
+                                <GradientStop Color="#FF5722" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                    </Border>
+                </Border>
+            </StackPanel>
+
+            <!-- Cancel Button -->
+            <Button Content="Cancel Recording"
+                    Command="{Binding CancelCommand}"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Center"
+                    Padding="8,4"/>
+        </StackPanel>
+    </Border>
+</Window>
