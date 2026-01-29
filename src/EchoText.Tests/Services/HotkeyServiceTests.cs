@@ -308,7 +308,7 @@ public class HotkeyServiceTests
     }
 
     [Fact]
-    public void Dispose_ShouldUnsubscribeFromConfigServiceEvents()
+    public async Task Dispose_ShouldUnsubscribeFromConfigServiceEvents()
     {
         // Arrange
         _mockPlatformHotkey.Setup(p => p.IsRegistered).Returns(true);
@@ -321,7 +321,7 @@ public class HotkeyServiceTests
         _mockConfigService.Raise(c => c.SettingsChanged += null, EventArgs.Empty);
 
         // Wait briefly
-        Task.Delay(50).Wait();
+        await Task.Delay(50);
 
         // Assert - Should not attempt re-registration
         _mockPlatformHotkey.Verify(p => p.Unregister(), Times.Never);

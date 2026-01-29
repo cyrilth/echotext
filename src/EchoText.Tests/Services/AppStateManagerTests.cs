@@ -18,7 +18,7 @@ public class AppStateManagerTests
     }
 
     [Fact]
-    public void TransitionTo_FromLoadingToIdle_ShouldSucceed()
+    public async Task TransitionTo_FromLoadingToIdle_ShouldSucceed()
     {
         // Arrange
         var stateManager = new AppStateManager();
@@ -33,7 +33,7 @@ public class AppStateManagerTests
         stateManager.CurrentState.Should().Be(AppState.Idle);
 
         // Wait briefly for async event
-        Task.Delay(50).Wait();
+        await Task.Delay(50);
         eventState.Should().Be(AppState.Idle);
     }
 
@@ -240,7 +240,7 @@ public class AppStateManagerTests
     }
 
     [Fact]
-    public void StateChanged_ShouldFireOnTransition()
+    public async Task StateChanged_ShouldFireOnTransition()
     {
         // Arrange
         var stateManager = new AppStateManager();
@@ -257,7 +257,7 @@ public class AppStateManagerTests
         stateManager.TransitionTo(AppState.Idle);
 
         // Wait for async event
-        Task.Delay(50).Wait();
+        await Task.Delay(50);
 
         // Assert
         eventFired.Should().BeTrue();
@@ -265,7 +265,7 @@ public class AppStateManagerTests
     }
 
     [Fact]
-    public void StateChanged_ShouldNotFireOnFailedTransition()
+    public async Task StateChanged_ShouldNotFireOnFailedTransition()
     {
         // Arrange
         var stateManager = new AppStateManager();
@@ -278,14 +278,14 @@ public class AppStateManagerTests
         stateManager.TransitionTo(AppState.Processing); // Invalid transition
 
         // Wait to ensure event doesn't fire
-        Task.Delay(50).Wait();
+        await Task.Delay(50);
 
         // Assert
         eventFired.Should().BeFalse();
     }
 
     [Fact]
-    public void CurrentState_IsThreadSafe()
+    public async Task CurrentState_IsThreadSafe()
     {
         // Arrange
         var stateManager = new AppStateManager();
@@ -308,7 +308,7 @@ public class AppStateManagerTests
             }));
         }
 
-        Task.WaitAll(tasks.ToArray());
+        await Task.WhenAll(tasks);
 
         // Assert - All reads should succeed without exception
         states.Should().HaveCount(1000);
@@ -316,7 +316,7 @@ public class AppStateManagerTests
     }
 
     [Fact]
-    public void TransitionTo_IsThreadSafe()
+    public async Task TransitionTo_IsThreadSafe()
     {
         // Arrange
         var stateManager = new AppStateManager();
@@ -336,7 +336,7 @@ public class AppStateManagerTests
             }));
         }
 
-        Task.WaitAll(tasks.ToArray());
+        await Task.WhenAll(tasks);
 
         // Assert - Only one transition should succeed
         successCount.Should().Be(1);
