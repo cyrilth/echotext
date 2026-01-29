@@ -656,12 +656,12 @@ Implement system tray icon with context menu.
 - Exit
 
 **Acceptance Criteria:**
-- [ ] Tray icon appears on app start
-- [ ] Icon changes based on app state
-- [ ] Context menu appears on right-click
-- [ ] Menu items trigger correct actions
-- [ ] "Exit" closes app cleanly
-- [ ] Works on all platforms
+- [x] Tray icon appears on app start
+- [x] Icon changes based on app state
+- [x] Context menu appears on right-click
+- [x] Menu items trigger correct actions
+- [x] "Exit" closes app cleanly
+- [x] Works on all platforms
 
 ---
 
@@ -1057,7 +1057,7 @@ For a single developer or AI agent, here's the recommended order:
 17. ✅ TASK-408: Implement NotificationService
 
 ### Sprint 4: UI & Integration
-18. ⬜ TASK-501: Create Tray Icon & Context Menu
+18. ✅ TASK-501: Create Tray Icon & Context Menu
 19. ⬜ TASK-502: Create Settings Window
 20. ⬜ TASK-504: Implement Main Orchestration Logic
 21. ⬜ TASK-601: Implement First-Run Experience
