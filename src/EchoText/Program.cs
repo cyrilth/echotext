@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using EchoText.Platform;
 
 namespace EchoText;
 
@@ -31,9 +32,10 @@ sealed class Program
     {
         var services = new ServiceCollection();
 
-        // TODO: Register services here when they are implemented
-        // Platform-specific services will be registered via PlatformServices.Register(services)
-        // Core services will be registered as they are implemented in later tasks
+        // Register platform-specific services
+        PlatformServices.Register(services);
+
+        // TODO: Register core services here as they are implemented in later tasks
 
         return services.BuildServiceProvider();
     }
