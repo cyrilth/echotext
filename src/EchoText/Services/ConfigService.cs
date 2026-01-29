@@ -22,9 +22,10 @@ public class ConfigService : IConfigService
     /// <summary>
     /// Initializes a new instance of the <see cref="ConfigService"/> class.
     /// </summary>
-    public ConfigService()
+    /// <param name="configFilePath">Optional custom path for the config file. If null, uses the default platform-specific path.</param>
+    public ConfigService(string? configFilePath = null)
     {
-        _configFilePath = Path.Combine(PlatformInfo.ConfigDirectory, ConfigFileName);
+        _configFilePath = configFilePath ?? Path.Combine(PlatformInfo.ConfigDirectory, ConfigFileName);
         _settings = new AppSettings();
     }
 

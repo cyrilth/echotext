@@ -34,11 +34,7 @@ public class ConfigServiceTests : IDisposable
     public async Task LoadAsync_CreatesConfigDirectoryIfNotExists()
     {
         // Arrange
-        var service = new ConfigService();
-
-        // The actual config directory will be created by the service
-        // We can't easily test this without modifying the service to accept a path
-        // For now, we verify the service doesn't throw
+        var service = new ConfigService(_testConfigFile);
 
         // Act
         var act = async () => await service.LoadAsync();
@@ -51,7 +47,7 @@ public class ConfigServiceTests : IDisposable
     public async Task LoadAsync_CreatesDefaultConfigIfFileDoesNotExist()
     {
         // Arrange
-        var service = new ConfigService();
+        var service = new ConfigService(_testConfigFile);
 
         // Act
         await service.LoadAsync();
@@ -68,7 +64,7 @@ public class ConfigServiceTests : IDisposable
     public async Task Settings_HasCorrectDefaultValues()
     {
         // Arrange
-        var service = new ConfigService();
+        var service = new ConfigService(_testConfigFile);
 
         // Act
         await service.LoadAsync();
@@ -95,7 +91,7 @@ public class ConfigServiceTests : IDisposable
     public async Task SaveAsync_FiresSettingsChangedEvent()
     {
         // Arrange
-        var service = new ConfigService();
+        var service = new ConfigService(_testConfigFile);
         await service.LoadAsync();
 
         var eventFired = false;
@@ -112,7 +108,7 @@ public class ConfigServiceTests : IDisposable
     public async Task SaveAsync_ThenLoadAsync_PreservesSettings()
     {
         // Arrange
-        var service1 = new ConfigService();
+        var service1 = new ConfigService(_testConfigFile);
         await service1.LoadAsync();
 
         // Modify settings
@@ -125,7 +121,7 @@ public class ConfigServiceTests : IDisposable
         await service1.SaveAsync();
 
         // Load with second service
-        var service2 = new ConfigService();
+        var service2 = new ConfigService(_testConfigFile);
         await service2.LoadAsync();
 
         // Assert
@@ -138,12 +134,8 @@ public class ConfigServiceTests : IDisposable
     [Fact]
     public async Task LoadAsync_WithInvalidJson_CreatesDefaultSettings()
     {
-        // This test would require the ability to inject a test path
-        // For now, we verify that LoadAsync handles the case gracefully
-        // by creating a new ConfigService which will start with defaults
-
         // Arrange
-        var service = new ConfigService();
+        var service = new ConfigService(_testConfigFile);
 
         // Act
         await service.LoadAsync();
@@ -156,7 +148,7 @@ public class ConfigServiceTests : IDisposable
     public async Task Settings_IsThreadSafe()
     {
         // Arrange
-        var service = new ConfigService();
+        var service = new ConfigService(_testConfigFile);
         await service.LoadAsync();
 
         // Act - Multiple concurrent save operations
