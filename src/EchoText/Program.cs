@@ -41,6 +41,7 @@ sealed class Program
         services.AddSingleton<IAppStateManager, AppStateManager>();
         services.AddSingleton<IConfigService, ConfigService>();
         services.AddSingleton<IHotkeyService, HotkeyService>();
+        services.AddSingleton<IAudioService, AudioService>();
 
         // TODO: Register remaining core services here as they are implemented in later tasks
 

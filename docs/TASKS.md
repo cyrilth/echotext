@@ -445,7 +445,7 @@ Implement hotkey service that wraps platform providers.
 | **ID** | TASK-403 |
 | **Complexity** | 🟡 Medium |
 | **Dependencies** | TASK-301, TASK-203 |
-| **Status** | ⬜ Not Started |
+| **Status** | ✅ Complete |
 
 **Description:**
 Implement audio capture service.
