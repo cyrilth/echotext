@@ -15,7 +15,16 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(sed:*)",
-      "Bash(dotnet restore:*)"
+      "Bash(dotnet restore:*)",
+      "Bash(Get-ChildItem -Path \"D:\\sources\\personal_repos\\echotext\\src\\EchoText\" -Directory -Recurse)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(Sort-Object)",
+      "Bash(for dir in \"Models\" \"Services/Interfaces\" \"Platform/Interfaces\" \"Platform/Windows\" \"Platform/Linux\" \"Platform/MacOS\")",
+      "Bash(do echo \"=== $dir ===\")",
+      "Bash(ls:*)",
+      "Bash(done)",
+      "Bash(taskkill:*)",
+      "Bash(dotnet test:*)"
     ],
     "deny": [],
     "ask": []

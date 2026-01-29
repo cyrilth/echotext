@@ -161,7 +161,7 @@ Set up the basic Avalonia application with entry point and app definition.
 | **ID** | TASK-201 |
 | **Complexity** | 🟢 Simple |
 | **Dependencies** | TASK-101 |
-| **Status** | ⬜ Not Started |
+| **Status** | ✅ Complete |
 
 **Description:**
 Create all data model classes as defined in ARCHITECTURE.md.
@@ -191,7 +191,7 @@ Create all data model classes as defined in ARCHITECTURE.md.
 | **ID** | TASK-202 |
 | **Complexity** | 🟢 Simple |
 | **Dependencies** | TASK-201 |
-| **Status** | ⬜ Not Started |
+| **Status** | ✅ Complete |
 
 **Description:**  
 Create platform detection and path resolution utilities.
@@ -1036,7 +1036,7 @@ For a single developer or AI agent, here's the recommended order:
 ### Sprint 1: Foundation
 1. ✅ TASK-101: Create Solution Structure
 2. ✅ TASK-102: Add NuGet Dependencies
-3. ⬜ TASK-201: Implement Data Models
+3. ✅ TASK-201: Implement Data Models
 4. ⬜ TASK-202: Implement PlatformInfo
 5. ⬜ TASK-203: Implement ConfigService
 6. ⬜ TASK-103: Create Base Avalonia App
