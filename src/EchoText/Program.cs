@@ -48,6 +48,9 @@ sealed class Program
         services.AddSingleton<IOutputService, OutputService>();
         services.AddSingleton<INotificationService, NotificationService>();
 
+        // Register ViewModels
+        services.AddSingleton<ViewModels.MainViewModel>();
+
         // TODO: Register remaining core services here as they are implemented in later tasks
 
         return services.BuildServiceProvider();

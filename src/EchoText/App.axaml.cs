@@ -4,8 +4,10 @@ using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 using EchoText.Views;
+using EchoText.ViewModels;
 using System;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace EchoText;
 
@@ -35,8 +37,14 @@ public partial class App : Application
             // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
             DisableAvaloniaDataAnnotationValidation();
 
-            desktop.MainWindow = new MainWindow();
-            // DataContext will be set later when MainViewModel is implemented
+            // Get MainViewModel from DI container
+            var mainViewModel = _serviceProvider?.GetService<MainViewModel>();
+            if (mainViewModel == null)
+            {
+                throw new InvalidOperationException("MainViewModel could not be resolved from DI container");
+            }
+
+            desktop.MainWindow = new MainWindow(mainViewModel);
         }
 
         base.OnFrameworkInitializationCompleted();

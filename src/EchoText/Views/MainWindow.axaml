@@ -2,13 +2,17 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:EchoText.ViewModels"
         mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="300"
         x:Class="EchoText.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
         Width="400" Height="300"
         Title="EchoText"
-        CanResize="False">
+        CanResize="False"
+        ShowInTaskbar="False"
+        WindowStartupLocation="CenterScreen">
 
-    <!-- Empty window for now. UI will be added in later tasks. -->
+    <!-- Main window content (minimal for now) -->
     <Grid>
         <TextBlock Text="EchoText"
                    HorizontalAlignment="Center"
