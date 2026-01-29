@@ -6,9 +6,9 @@ A privacy-focused, cross-platform speech-to-text application that runs completel
 
 ![EchoText Demo](docs/images/demo.gif)
 
-[![Build Status](https://github.com/yourusername/echotext/workflows/Build/badge.svg)](https://github.com/yourusername/echotext/actions)
+[![Build Status](https://github.com/cyrilth/echotext/workflows/Build/badge.svg)](https://github.com/cyrilth/echotext/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Latest Release](https://img.shields.io/github/v/release/yourusername/echotext)](https://github.com/yourusername/echotext/releases)
+[![Latest Release](https://img.shields.io/github/v/release/cyrilth/echotext)](https://github.com/cyrilth/echotext/releases)
 
 ---
 
@@ -44,7 +44,7 @@ A privacy-focused, cross-platform speech-to-text application that runs completel
 
 ### Windows
 
-1. Download `EchoText-{version}-win-x64.zip` from [Releases](https://github.com/yourusername/echotext/releases)
+1. Download `EchoText-{version}-win-x64.zip` from [Releases](https://github.com/cyrilth/echotext/releases)
 2. Extract to a folder (e.g., `C:\Program Files\EchoText`)
 3. Run `EchoText.exe`
 4. If "Windows protected your PC" appears:
@@ -61,7 +61,7 @@ A privacy-focused, cross-platform speech-to-text application that runs completel
 
 ```bash
 # Download the AppImage
-wget https://github.com/yourusername/echotext/releases/download/v1.0.0/EchoText-1.0.0-linux-x64.AppImage
+wget https://github.com/cyrilth/echotext/releases/download/v1.0.0/EchoText-1.0.0-linux-x64.AppImage
 
 # Make it executable
 chmod +x EchoText-*.AppImage
@@ -74,7 +74,7 @@ chmod +x EchoText-*.AppImage
 
 ```bash
 # Download and extract
-wget https://github.com/yourusername/echotext/releases/download/v1.0.0/EchoText-1.0.0-linux-x64.tar.gz
+wget https://github.com/cyrilth/echotext/releases/download/v1.0.0/EchoText-1.0.0-linux-x64.tar.gz
 tar -xzf EchoText-*.tar.gz
 cd EchoText
 
@@ -200,7 +200,7 @@ Right-click the system tray icon and select **Settings** to customize:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/echotext.git
+git clone https://github.com/cyrilth/echotext.git
 cd echotext
 
 # Restore dependencies
@@ -345,8 +345,8 @@ Then restart GNOME Shell (Alt+F2, type `r`, press Enter).
 
 We welcome contributions! Here's how you can help:
 
-1. **Report Bugs:** Open an [issue](https://github.com/yourusername/echotext/issues) with details
-2. **Suggest Features:** Share your ideas in [discussions](https://github.com/yourusername/echotext/discussions)
+1. **Report Bugs:** Open an [issue](https://github.com/cyrilth/echotext/issues) with details
+2. **Suggest Features:** Share your ideas in [discussions](https://github.com/cyrilth/echotext/discussions)
 3. **Submit Pull Requests:**
    - Fork the repository
    - Create a feature branch (`git checkout -b feature/amazing-feature`)
@@ -423,8 +423,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Support
 
 - **Documentation:** [docs/](docs/)
-- **Issues:** [GitHub Issues](https://github.com/yourusername/echotext/issues)
-- **Discussions:** [GitHub Discussions](https://github.com/yourusername/echotext/discussions)
+- **Issues:** [GitHub Issues](https://github.com/cyrilth/echotext/issues)
+- **Discussions:** [GitHub Discussions](https://github.com/cyrilth/echotext/discussions)
 
 ---
 
