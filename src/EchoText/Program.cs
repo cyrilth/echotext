@@ -50,6 +50,7 @@ sealed class Program
 
         // Register ViewModels
         services.AddSingleton<ViewModels.MainViewModel>();
+        services.AddTransient<ViewModels.SettingsViewModel>();
 
         // TODO: Register remaining core services here as they are implemented in later tasks
 

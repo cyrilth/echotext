@@ -4,6 +4,8 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EchoText.Models;
 using EchoText.Services.Interfaces;
+using EchoText.Views;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace EchoText.ViewModels;
 
@@ -13,6 +15,7 @@ namespace EchoText.ViewModels;
 public partial class MainViewModel : ViewModelBase
 {
     private readonly IAppStateManager _appStateManager;
+    private readonly IServiceProvider _serviceProvider;
 
     [ObservableProperty]
     private string _statusText = "Idle";
@@ -24,9 +27,11 @@ public partial class MainViewModel : ViewModelBase
     /// Initializes a new instance of the MainViewModel
     /// </summary>
     /// <param name="appStateManager">Application state manager</param>
-    public MainViewModel(IAppStateManager appStateManager)
+    /// <param name="serviceProvider">Service provider for creating windows</param>
+    public MainViewModel(IAppStateManager appStateManager, IServiceProvider serviceProvider)
     {
         _appStateManager = appStateManager ?? throw new ArgumentNullException(nameof(appStateManager));
+        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
 
         // Subscribe to state changes
         _appStateManager.StateChanged += OnAppStateChanged;
@@ -41,8 +46,10 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void OpenSettings()
     {
-        // TODO: Implement in TASK-502
-        // Open settings window
+        // Create settings window with ViewModel from DI
+        var viewModel = _serviceProvider.GetRequiredService<SettingsViewModel>();
+        var settingsWindow = new SettingsWindow(viewModel);
+        settingsWindow.Show();
     }
 
     /// <summary>

@@ -1,0 +1,242 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:EchoText.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="700"
+        x:Class="EchoText.Views.SettingsWindow"
+        x:DataType="vm:SettingsViewModel"
+        Title="EchoText - Settings"
+        Width="600" Height="700"
+        MinWidth="500" MinHeight="600"
+        Icon="/Assets/Icons/tray-idle.ico"
+        WindowStartupLocation="CenterScreen"
+        CanResize="True">
+
+    <Design.DataContext>
+        <vm:SettingsViewModel/>
+    </Design.DataContext>
+
+    <Grid RowDefinitions="*,Auto">
+        <!-- Main Content -->
+        <ScrollViewer Grid.Row="0" Padding="20">
+            <StackPanel Spacing="20">
+
+                <!-- Audio Settings Section -->
+                <Border BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                        BorderThickness="1"
+                        CornerRadius="4"
+                        Padding="15">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="Audio"
+                                   FontSize="16"
+                                   FontWeight="SemiBold"
+                                   Margin="0,0,0,10"/>
+
+                        <StackPanel Spacing="5">
+                            <TextBlock Text="Input Device:"/>
+                            <ComboBox ItemsSource="{Binding AudioDevices}"
+                                      SelectedItem="{Binding SelectedAudioDevice}"
+                                      IsEnabled="{Binding !IsLoadingAudioDevices}"
+                                      HorizontalAlignment="Stretch">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" Spacing="5">
+                                            <TextBlock Text="{Binding Name}"/>
+                                            <TextBlock Text="(Default)"
+                                                       FontStyle="Italic"
+                                                       IsVisible="{Binding IsDefault}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <Button Content="Test Audio"
+                                Command="{Binding TestAudioCommand}"
+                                HorizontalAlignment="Left"
+                                Margin="0,5,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Hotkey Settings Section -->
+                <Border BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                        BorderThickness="1"
+                        CornerRadius="4"
+                        Padding="15">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="Hotkey"
+                                   FontSize="16"
+                                   FontWeight="SemiBold"
+                                   Margin="0,0,0,10"/>
+
+                        <StackPanel Spacing="5">
+                            <TextBlock Text="Mode:"/>
+                            <StackPanel Spacing="5">
+                                <RadioButton Content="Push-to-Talk (Hold to record, release to stop)"
+                                             IsChecked="{Binding IsPushToTalkMode}"/>
+                                <RadioButton Content="Toggle (Press to start, press again to stop)"
+                                             IsChecked="{Binding IsToggleMode}"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel Spacing="5" Margin="0,10,0,0">
+                            <TextBlock Text="Key Combination:"/>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBox Grid.Column="0"
+                                         Text="{Binding HotkeyDisplay}"
+                                         IsReadOnly="True"
+                                         Watermark="Click Change to set hotkey"/>
+                                <Button Grid.Column="1"
+                                        Content="Change"
+                                        Command="{Binding ChangeHotkeyCommand}"
+                                        Margin="5,0,0,0"/>
+                            </Grid>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Output Settings Section -->
+                <Border BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                        BorderThickness="1"
+                        CornerRadius="4"
+                        Padding="15">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="Output"
+                                   FontSize="16"
+                                   FontWeight="SemiBold"
+                                   Margin="0,0,0,10"/>
+
+                        <CheckBox Content="Copy to clipboard"
+                                  IsChecked="{Binding CopyToClipboard}"/>
+                        <CheckBox Content="Auto-type into active window"
+                                  IsChecked="{Binding AutoType}"/>
+                        <CheckBox Content="Play sound on completion"
+                                  IsChecked="{Binding PlaySoundOnComplete}"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Recognition Settings Section -->
+                <Border BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                        BorderThickness="1"
+                        CornerRadius="4"
+                        Padding="15">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="Recognition"
+                                   FontSize="16"
+                                   FontWeight="SemiBold"
+                                   Margin="0,0,0,10"/>
+
+                        <StackPanel Spacing="5">
+                            <TextBlock Text="Whisper Model:"/>
+                            <ComboBox ItemsSource="{Binding AvailableModels}"
+                                      SelectedItem="{Binding SelectedModel}"
+                                      IsEnabled="{Binding !IsLoadingModels}"
+                                      HorizontalAlignment="Stretch">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" Spacing="5">
+                                            <TextBlock Text="{Binding DisplayName}"/>
+                                            <TextBlock Text="(Downloaded)"
+                                                       FontStyle="Italic"
+                                                       Foreground="Green"
+                                                       IsVisible="{Binding IsDownloaded}"/>
+                                            <TextBlock Text="-"/>
+                                            <TextBlock Text="{Binding SizeBytes, StringFormat={}{0:N0} bytes}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <!-- Download Button and Progress -->
+                        <StackPanel Spacing="5"
+                                    IsVisible="{Binding SelectedModel, Converter={x:Static ObjectConverters.IsNotNull}}">
+                            <Button Content="Download Model"
+                                    Command="{Binding DownloadModelCommand}"
+                                    IsVisible="{Binding !SelectedModel.IsDownloaded}"
+                                    HorizontalAlignment="Left"/>
+
+                            <StackPanel Spacing="5" IsVisible="{Binding IsDownloadingModel}">
+                                <ProgressBar Value="{Binding DownloadProgress}"
+                                             Minimum="0"
+                                             Maximum="100"
+                                             Height="4"/>
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Grid.Column="0"
+                                               Text="{Binding DownloadProgress, StringFormat=Downloading: {0:F1}%}"/>
+                                    <Button Grid.Column="1"
+                                            Content="Cancel"
+                                            Command="{Binding CancelDownloadCommand}"/>
+                                </Grid>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel Spacing="5" Margin="0,10,0,0">
+                            <TextBlock Text="Language:"/>
+                            <ComboBox ItemsSource="{Binding AvailableLanguages}"
+                                      SelectedItem="{Binding SelectedLanguage}"
+                                      HorizontalAlignment="Stretch">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding DisplayName}"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- General Settings Section -->
+                <Border BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                        BorderThickness="1"
+                        CornerRadius="4"
+                        Padding="15">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="General"
+                                   FontSize="16"
+                                   FontWeight="SemiBold"
+                                   Margin="0,0,0,10"/>
+
+                        <CheckBox Content="Start with system"
+                                  IsChecked="{Binding StartWithSystem}"/>
+                        <CheckBox Content="Show notifications"
+                                  IsChecked="{Binding ShowNotifications}"/>
+                        <CheckBox Content="Check for updates"
+                                  IsChecked="{Binding CheckForUpdates}"/>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Bottom Button Bar -->
+        <Border Grid.Row="1"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                BorderThickness="0,1,0,0"
+                Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                Padding="20,15">
+            <Grid ColumnDefinitions="*,Auto,Auto">
+                <TextBlock Grid.Column="0"
+                           Text="You have unsaved changes"
+                           VerticalAlignment="Center"
+                           Foreground="Orange"
+                           FontStyle="Italic"
+                           IsVisible="{Binding HasUnsavedChanges}"/>
+
+                <Button Grid.Column="1"
+                        Content="Cancel"
+                        Command="{Binding CancelCommand}"
+                        Margin="0,0,10,0"
+                        MinWidth="100"/>
+
+                <Button Grid.Column="2"
+                        Content="Save"
+                        Command="{Binding SaveCommand}"
+                        MinWidth="100"
+                        Classes="accent"/>
+            </Grid>
+        </Border>
+    </Grid>
+
+</Window>

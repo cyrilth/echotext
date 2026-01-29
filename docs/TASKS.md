@@ -671,7 +671,7 @@ Implement system tray icon with context menu.
 | **ID** | TASK-502 |
 | **Complexity** | 🔴 Complex |
 | **Dependencies** | TASK-203, TASK-402, TASK-403 |
-| **Status** | ⬜ Not Started |
+| **Status** | ✅ Complete |
 
 **Description:**
 Implement settings window UI.
@@ -689,13 +689,13 @@ Implement settings window UI.
 - General: Start with system, show notifications
 
 **Acceptance Criteria:**
-- [ ] All settings displayed correctly
-- [ ] Audio device dropdown populated
-- [ ] Hotkey picker works
-- [ ] Changes saved on Save button
-- [ ] Changes discarded on Cancel button
-- [ ] Model download triggered if needed
-- [ ] Works on all platforms
+- [x] All settings displayed correctly
+- [x] Audio device dropdown populated
+- [x] Hotkey picker works
+- [x] Changes saved on Save button
+- [x] Changes discarded on Cancel button
+- [x] Model download triggered if needed
+- [x] Works on all platforms
 
 ---
 
