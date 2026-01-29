@@ -413,7 +413,7 @@ Implement application state machine.
 | **ID** | TASK-402 |
 | **Complexity** | 🟡 Medium |
 | **Dependencies** | TASK-301, TASK-203 |
-| **Status** | ⬜ Not Started |
+| **Status** | ✅ Complete |
 
 **Description:**
 Implement hotkey service that wraps platform providers.
@@ -429,13 +429,13 @@ Implement hotkey service that wraps platform providers.
 - Re-register hotkey when config changes
 
 **Acceptance Criteria:**
-- [ ] Hotkey can be registered
-- [ ] HotkeyPressed fires on key down
-- [ ] HotkeyReleased fires on key up
-- [ ] Push-to-Talk mode works correctly
-- [ ] Toggle mode works correctly
-- [ ] Config changes re-register hotkey
-- [ ] Unit tests pass
+- [x] Hotkey can be registered
+- [x] HotkeyPressed fires on key down
+- [x] HotkeyReleased fires on key up
+- [x] Push-to-Talk mode works correctly
+- [x] Toggle mode works correctly
+- [x] Config changes re-register hotkey
+- [x] Unit tests pass
 
 ---
 
