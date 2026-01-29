@@ -17,6 +17,8 @@ namespace EchoText.Services;
 public class ModelManager : IModelManager
 {
     private static readonly HttpClient _httpClient = new();
+    private static readonly SemaphoreSlim _downloadLock = new(1, 1);
+    private static string? _currentlyDownloading;
 
     private static readonly Dictionary<string, ModelInfo> _modelDefinitions = new()
     {
@@ -85,69 +87,88 @@ public class ModelManager : IModelManager
             throw new ArgumentException($"Unknown model: {modelName}", nameof(modelName));
         }
 
-        EnsureModelsDirectoryExists();
-
-        var modelPath = GetModelFilePath(modelName);
-        var tempPath = modelPath + ".tmp";
-
+        // Prevent concurrent downloads of the same model
+        await _downloadLock.WaitAsync(cancellationToken);
         try
         {
-            // Delete temp file if it exists from a previous failed download
-            if (File.Exists(tempPath))
+            // Check if this model is already being downloaded
+            if (_currentlyDownloading == modelName)
             {
-                File.Delete(tempPath);
+                throw new InvalidOperationException($"Model '{modelName}' is already being downloaded.");
             }
+            _currentlyDownloading = modelName;
 
-            using var response = await _httpClient.GetAsync(modelInfo.Url, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
-            response.EnsureSuccessStatusCode();
+            EnsureModelsDirectoryExists();
 
-            var totalBytes = response.Content.Headers.ContentLength ?? modelInfo.SizeBytes;
-            var downloadedBytes = 0L;
+            var modelPath = GetModelFilePath(modelName);
+            var tempPath = modelPath + ".tmp";
 
-            using var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken);
-            using var fileStream = new FileStream(tempPath, FileMode.Create, FileAccess.Write, FileShare.None, 8192, true);
-
-            var buffer = new byte[8192];
-            int bytesRead;
-
-            while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length, cancellationToken)) > 0)
+            try
             {
-                await fileStream.WriteAsync(buffer, 0, bytesRead, cancellationToken);
-                downloadedBytes += bytesRead;
-
-                // Report progress
-                if (progress != null && totalBytes > 0)
-                {
-                    var progressPercentage = (double)downloadedBytes / totalBytes;
-                    progress.Report(progressPercentage);
-                }
-            }
-
-            // Download complete, move temp file to final location
-            if (File.Exists(modelPath))
-            {
-                File.Delete(modelPath);
-            }
-            File.Move(tempPath, modelPath);
-
-            // Report 100% completion
-            progress?.Report(1.0);
-        }
-        catch
-        {
-            // Clean up temp file on error
-            if (File.Exists(tempPath))
-            {
-                try
+                // Delete temp file if it exists from a previous failed download
+                if (File.Exists(tempPath))
                 {
                     File.Delete(tempPath);
                 }
-                catch
+
+                using var response = await _httpClient.GetAsync(modelInfo.Url, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+                response.EnsureSuccessStatusCode();
+
+                var totalBytes = response.Content.Headers.ContentLength ?? modelInfo.SizeBytes;
+                var downloadedBytes = 0L;
+
+                // Use explicit using blocks so streams are closed before File.Move
+                using (var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken))
+                using (var fileStream = new FileStream(tempPath, FileMode.Create, FileAccess.Write, FileShare.None, 8192, true))
                 {
-                    // Ignore cleanup errors
+                    var buffer = new byte[8192];
+                    int bytesRead;
+
+                    while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length, cancellationToken)) > 0)
+                    {
+                        await fileStream.WriteAsync(buffer, 0, bytesRead, cancellationToken);
+                        downloadedBytes += bytesRead;
+
+                        // Report progress
+                        if (progress != null && totalBytes > 0)
+                        {
+                            var progressPercentage = (double)downloadedBytes / totalBytes;
+                            progress.Report(progressPercentage);
+                        }
+                    }
                 }
+
+                // Download complete, move temp file to final location (streams are now closed)
+                if (File.Exists(modelPath))
+                {
+                    File.Delete(modelPath);
+                }
+                File.Move(tempPath, modelPath);
+
+                // Report 100% completion
+                progress?.Report(1.0);
             }
-            throw;
+            catch
+            {
+                // Clean up temp file on error
+                if (File.Exists(tempPath))
+                {
+                    try
+                    {
+                        File.Delete(tempPath);
+                    }
+                    catch
+                    {
+                        // Ignore cleanup errors
+                    }
+                }
+                throw;
+            }
+        }
+        finally
+        {
+            _currentlyDownloading = null;
+            _downloadLock.Release();
         }
     }
 

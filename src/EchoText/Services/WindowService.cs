@@ -92,15 +92,20 @@ public sealed class WindowService : IWindowService
 
         // Show dialog and wait for result
         var mainWindow = GetMainWindow();
+        bool result;
+
         if (mainWindow == null)
         {
-            // If no main window, show as regular window instead of dialog
+            // If no main window, show as regular window and wait for it to close
+            var tcs = new TaskCompletionSource<bool>();
+            dialog.Closed += (_, _) => tcs.TrySetResult(viewModel.ModelDownloaded);
             dialog.Show();
-            viewModel.Dispose();
-            return false;
+            result = await tcs.Task;
         }
-
-        var result = await dialog.ShowDialog<bool>(mainWindow);
+        else
+        {
+            result = await dialog.ShowDialog<bool>(mainWindow);
+        }
 
         // Dispose ViewModel
         viewModel.Dispose();
