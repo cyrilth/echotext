@@ -45,6 +45,7 @@ sealed class Program
         services.AddSingleton<IModelManager, ModelManager>();
         services.AddSingleton<ITranscriptionService, TranscriptionService>();
         services.AddSingleton<IClipboardService, ClipboardService>();
+        services.AddSingleton<IOutputService, OutputService>();
 
         // TODO: Register remaining core services here as they are implemented in later tasks
 

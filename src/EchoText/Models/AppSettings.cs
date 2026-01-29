@@ -71,6 +71,11 @@ public class OutputSettings
     /// Whether to play sound effects on completion
     /// </summary>
     public bool PlaySoundOnComplete { get; set; } = true;
+
+    /// <summary>
+    /// Delay in milliseconds between keystrokes when auto-typing
+    /// </summary>
+    public int KeystrokeDelayMs { get; set; } = 10;
 }
 
 /// <summary>
