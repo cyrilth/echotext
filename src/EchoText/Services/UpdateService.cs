@@ -16,7 +16,7 @@ namespace EchoText.Services;
 /// </summary>
 public class UpdateService : IUpdateService
 {
-    private const string GitHubOwner = "yourusername";  // TODO: Update with actual GitHub username
+    private const string GitHubOwner = "cyrilth";
     private const string GitHubRepo = "echotext";
     private const string GitHubApiUrl = $"https://api.github.com/repos/{GitHubOwner}/{GitHubRepo}/releases/latest";
     private const string GitHubReleasesUrl = $"https://github.com/{GitHubOwner}/{GitHubRepo}/releases";
