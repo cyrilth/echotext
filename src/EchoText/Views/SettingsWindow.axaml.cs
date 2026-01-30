@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using EchoText.Models;
 using EchoText.ViewModels;
 
@@ -13,6 +14,14 @@ public partial class SettingsWindow : Window
     public SettingsWindow()
     {
         InitializeComponent();
+    }
+
+    /// <summary>
+    /// Handle the Close button click.
+    /// </summary>
+    private void OnCloseClick(object? sender, RoutedEventArgs e)
+    {
+        Close();
     }
 
     /// <summary>

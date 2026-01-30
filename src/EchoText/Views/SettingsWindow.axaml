@@ -224,7 +224,7 @@
                 BorderThickness="0,1,0,0"
                 Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
                 Padding="20,15">
-            <Grid ColumnDefinitions="*,Auto,Auto">
+            <Grid ColumnDefinitions="*,Auto,Auto,Auto">
                 <TextBlock Grid.Column="0"
                            Text="You have unsaved changes"
                            VerticalAlignment="Center"
@@ -233,12 +233,19 @@
                            IsVisible="{Binding HasUnsavedChanges}"/>
 
                 <Button Grid.Column="1"
-                        Content="Cancel"
-                        Command="{Binding CancelCommand}"
+                        Content="Close"
+                        Click="OnCloseClick"
                         Margin="0,0,10,0"
                         MinWidth="100"/>
 
                 <Button Grid.Column="2"
+                        Content="Cancel"
+                        Command="{Binding CancelCommand}"
+                        IsEnabled="{Binding HasUnsavedChanges}"
+                        Margin="0,0,10,0"
+                        MinWidth="100"/>
+
+                <Button Grid.Column="3"
                         Content="Save"
                         Command="{Binding SaveCommand}"
                         MinWidth="100"
