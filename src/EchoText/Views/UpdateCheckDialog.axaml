@@ -54,8 +54,8 @@
                 <Button x:Name="DownloadButton"
                         Content="Download Update"
                         IsVisible="False"
-                        Width="130"
-                        Padding="12,8"
+                        Width="150"
+                        Padding="16,8"
                         Classes="accent"
                         Click="OnDownloadClick"/>
                 <Button Content="Close"
