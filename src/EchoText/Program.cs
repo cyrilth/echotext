@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
+using System.Threading;
 using EchoText.Platform;
 using EchoText.Services;
 using EchoText.Services.Interfaces;
@@ -11,12 +12,23 @@ namespace EchoText;
 
 sealed class Program
 {
+    private const string MutexName = "EchoText_SingleInstance_Mutex";
+
     // Initialization code. Don't use any Avalonia, third-party APIs or any
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
     // yet and stuff might break.
     [STAThread]
     public static void Main(string[] args)
     {
+        // Ensure only one instance is running
+        using var mutex = new Mutex(true, MutexName, out bool isNewInstance);
+
+        if (!isNewInstance)
+        {
+            // Another instance is already running
+            return;
+        }
+
         // Ensure log directory exists
         EnsureLogDirectoryExists();
 
