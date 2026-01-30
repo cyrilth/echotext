@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-01-30
+
+### Added
+- Start with System option to automatically launch EchoText on login
+  - Windows: Registry-based startup (HKCU\Software\Microsoft\Windows\CurrentVersion\Run)
+  - Linux: XDG Autostart desktop entry (~/.config/autostart/)
+  - macOS: LaunchAgent plist file (~/Library/LaunchAgents/)
+
+### Fixed
+- Threading issues causing UI crashes when showing/hiding recording overlay
+- Hotkey detection not recognizing modifier keys correctly
+- Download button greyed out in Settings when selecting a model
+- Unable to change keyboard shortcut in Settings window
+- Selected model not loading after changing in Settings (required restart)
+
+### Changed
+- Improved CI workflow with proper permissions for test reporting
+
 ## [1.0.0] - 2026-01-29
 
 ### Added
@@ -36,5 +54,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - No data is sent to external servers
 - Privacy-first architecture
 
-[Unreleased]: https://github.com/cyrilth/echotext/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/cyrilth/echotext/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/cyrilth/echotext/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/cyrilth/echotext/releases/tag/v1.0.0
