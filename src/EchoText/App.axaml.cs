@@ -71,6 +71,9 @@ public partial class App : Application
             // Dispose the service provider itself
             (_serviceProvider as IDisposable)?.Dispose();
         }
+
+        // Force exit to ensure SharpHook background thread is terminated
+        Environment.Exit(0);
     }
 
     private void DisableAvaloniaDataAnnotationValidation()
