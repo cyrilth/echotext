@@ -7,8 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.3] - 2026-01-30
+
 ### Added
-- About dialog showing application version and information
+- About dialog showing application version, MIT license, and information
 - Toast notifications using Avalonia's notification system (bottom-right corner)
 - Update check dialog showing current version, latest version, and download link
 
@@ -67,7 +69,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - No data is sent to external servers
 - Privacy-first architecture
 
-[Unreleased]: https://github.com/cyrilth/echotext/compare/v1.0.2...HEAD
+[Unreleased]: https://github.com/cyrilth/echotext/compare/v1.0.3...HEAD
+[1.0.3]: https://github.com/cyrilth/echotext/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/cyrilth/echotext/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/cyrilth/echotext/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/cyrilth/echotext/releases/tag/v1.0.0
