@@ -191,10 +191,8 @@ public sealed class WindowService : IWindowService
     /// <inheritdoc />
     public void ExitApplication()
     {
-        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-        {
-            desktop.Shutdown();
-        }
+        // Force kill the process to ensure all background threads are terminated
+        System.Diagnostics.Process.GetCurrentProcess().Kill();
     }
 
     /// <summary>
