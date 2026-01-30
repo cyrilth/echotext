@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EchoText.Models;
+using EchoText.Platform.Interfaces;
 using EchoText.Services.Interfaces;
 
 namespace EchoText.ViewModels;
@@ -21,6 +22,7 @@ public partial class SettingsViewModel : ViewModelBase
     private readonly IModelManager _modelManager;
     private readonly IHotkeyService _hotkeyService;
     private readonly INotificationService _notificationService;
+    private readonly IPlatformStartup _platformStartup;
 
     // Working copy of settings (not saved until user clicks Save)
     private AppSettings _workingSettings;
@@ -107,13 +109,15 @@ public partial class SettingsViewModel : ViewModelBase
         IAudioService audioService,
         IModelManager modelManager,
         IHotkeyService hotkeyService,
-        INotificationService notificationService)
+        INotificationService notificationService,
+        IPlatformStartup platformStartup)
     {
         _configService = configService ?? throw new ArgumentNullException(nameof(configService));
         _audioService = audioService ?? throw new ArgumentNullException(nameof(audioService));
         _modelManager = modelManager ?? throw new ArgumentNullException(nameof(modelManager));
         _hotkeyService = hotkeyService ?? throw new ArgumentNullException(nameof(hotkeyService));
         _notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
+        _platformStartup = platformStartup ?? throw new ArgumentNullException(nameof(platformStartup));
 
         // Create a working copy of settings
         _workingSettings = CloneSettings(_configService.Settings);
@@ -252,8 +256,9 @@ public partial class SettingsViewModel : ViewModelBase
         SelectedLanguage = AvailableLanguages.FirstOrDefault(l => l.Code == _workingSettings.Recognition.Language)
             ?? AvailableLanguages.FirstOrDefault();
 
-        // General settings
-        StartWithSystem = _workingSettings.General.StartWithSystem;
+        // General settings - sync StartWithSystem with actual platform state
+        StartWithSystem = _platformStartup.IsEnabled;
+        _workingSettings.General.StartWithSystem = StartWithSystem;
         ShowNotifications = _workingSettings.General.ShowNotifications;
         CheckForUpdates = _workingSettings.General.CheckForUpdates;
 
@@ -406,6 +411,41 @@ public partial class SettingsViewModel : ViewModelBase
         await _configService.SaveAsync();
 
         HasUnsavedChanges = false;
+
+        // Update startup with system setting
+        try
+        {
+            var executablePath = Environment.ProcessPath;
+            if (_workingSettings.General.StartWithSystem)
+            {
+                if (!string.IsNullOrEmpty(executablePath) && !_platformStartup.IsEnabled)
+                {
+                    var success = _platformStartup.Enable(executablePath);
+                    if (!success)
+                    {
+                        await _notificationService.ShowNotificationAsync(
+                            "Startup Setting Failed",
+                            "Failed to enable start with system. You may need to configure this manually.",
+                            NotificationType.Warning);
+                    }
+                }
+            }
+            else
+            {
+                if (_platformStartup.IsEnabled)
+                {
+                    _platformStartup.Disable();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to update startup setting: {ex.Message}");
+            await _notificationService.ShowNotificationAsync(
+                "Startup Setting Error",
+                "An error occurred while updating the startup setting.",
+                NotificationType.Error);
+        }
 
         // Re-register hotkey if it changed
         if (_hotkeyService.IsRegistered)

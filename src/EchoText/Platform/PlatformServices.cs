@@ -21,10 +21,13 @@ public static class PlatformServices
     {
         if (PlatformInfo.IsWindows)
         {
+#pragma warning disable CA1416 // Platform compatibility - guarded by IsWindows check
             services.AddSingleton<IPlatformHotkey, WindowsHotkeyProvider>();
             services.AddSingleton<IPlatformAudio, WindowsAudioProvider>();
             services.AddSingleton<IPlatformClipboard, WindowsClipboardProvider>();
             services.AddSingleton<IPlatformOutput, WindowsOutputProvider>();
+            services.AddSingleton<IPlatformStartup, WindowsStartupProvider>();
+#pragma warning restore CA1416
         }
         else if (PlatformInfo.IsLinux)
         {
@@ -32,6 +35,7 @@ public static class PlatformServices
             services.AddSingleton<IPlatformAudio, LinuxAudioProvider>();
             services.AddSingleton<IPlatformClipboard, LinuxClipboardProvider>();
             services.AddSingleton<IPlatformOutput, LinuxOutputProvider>();
+            services.AddSingleton<IPlatformStartup, LinuxStartupProvider>();
         }
         else if (PlatformInfo.IsMacOS)
         {
@@ -39,6 +43,7 @@ public static class PlatformServices
             services.AddSingleton<IPlatformAudio, MacOSAudioProvider>();
             services.AddSingleton<IPlatformClipboard, MacOSClipboardProvider>();
             services.AddSingleton<IPlatformOutput, MacOSOutputProvider>();
+            services.AddSingleton<IPlatformStartup, MacOSStartupProvider>();
         }
         else
         {

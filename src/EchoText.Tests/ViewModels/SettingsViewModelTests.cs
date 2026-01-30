@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EchoText.Models;
+using EchoText.Platform.Interfaces;
 using EchoText.Services.Interfaces;
 using EchoText.ViewModels;
 using FluentAssertions;
@@ -19,6 +20,7 @@ public class SettingsViewModelTests
     private readonly Mock<IModelManager> _mockModelManager;
     private readonly Mock<IHotkeyService> _mockHotkeyService;
     private readonly Mock<INotificationService> _mockNotificationService;
+    private readonly Mock<IPlatformStartup> _mockPlatformStartup;
     private readonly AppSettings _testSettings;
 
     public SettingsViewModelTests()
@@ -28,6 +30,7 @@ public class SettingsViewModelTests
         _mockModelManager = new Mock<IModelManager>();
         _mockHotkeyService = new Mock<IHotkeyService>();
         _mockNotificationService = new Mock<INotificationService>();
+        _mockPlatformStartup = new Mock<IPlatformStartup>();
 
         // Setup default test settings
         _testSettings = new AppSettings
@@ -106,7 +109,8 @@ public class SettingsViewModelTests
             _mockAudioService.Object,
             _mockModelManager.Object,
             _mockHotkeyService.Object,
-            _mockNotificationService.Object);
+            _mockNotificationService.Object,
+            _mockPlatformStartup.Object);
 
         act.Should().Throw<ArgumentNullException>();
     }
@@ -672,6 +676,7 @@ public class SettingsViewModelTests
             _mockAudioService.Object,
             _mockModelManager.Object,
             _mockHotkeyService.Object,
-            _mockNotificationService.Object);
+            _mockNotificationService.Object,
+            _mockPlatformStartup.Object);
     }
 }
