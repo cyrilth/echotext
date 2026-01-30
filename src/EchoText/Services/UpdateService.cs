@@ -14,7 +14,7 @@ namespace EchoText.Services;
 /// <summary>
 /// Service for checking for application updates from GitHub releases.
 /// </summary>
-public class UpdateService : IUpdateService
+public partial class UpdateService : IUpdateService
 {
     private const string GitHubOwner = "cyrilth";
     private const string GitHubRepo = "echotext";
@@ -54,7 +54,7 @@ public class UpdateService : IUpdateService
             }
 
             var jsonContent = await response.Content.ReadAsStringAsync(cancellationToken);
-            var release = JsonSerializer.Deserialize<GitHubRelease>(jsonContent);
+            var release = JsonSerializer.Deserialize(jsonContent, UpdateServiceJsonContext.Default.GitHubRelease);
 
             if (release?.TagName == null)
             {
@@ -182,5 +182,13 @@ public class UpdateService : IUpdateService
 
         [JsonPropertyName("published_at")]
         public string? PublishedAt { get; set; }
+    }
+
+    /// <summary>
+    /// JSON source generator context for AOT/trimming compatibility.
+    /// </summary>
+    [JsonSerializable(typeof(GitHubRelease))]
+    private partial class UpdateServiceJsonContext : JsonSerializerContext
+    {
     }
 }
