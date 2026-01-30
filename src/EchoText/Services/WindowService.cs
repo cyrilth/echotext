@@ -19,6 +19,7 @@ public sealed class WindowService : IWindowService
     private readonly IServiceProvider _serviceProvider;
     private SettingsWindow? _settingsWindow;
     private RecordingOverlay? _recordingOverlay;
+    private AboutWindow? _aboutWindow;
 
     /// <summary>
     /// Initializes a new instance of the WindowService.
@@ -126,6 +127,65 @@ public sealed class WindowService : IWindowService
         viewModel.Dispose();
 
         return result;
+    }
+
+    /// <inheritdoc />
+    public void ShowAboutWindow()
+    {
+        // Must run on UI thread since we're creating/showing a window
+        Dispatcher.UIThread.Post(() =>
+        {
+            // If about window is already open, bring it to front
+            if (_aboutWindow != null)
+            {
+                _aboutWindow.Activate();
+                return;
+            }
+
+            // Create new about window
+            _aboutWindow = new AboutWindow();
+
+            // Handle window closed to clear reference
+            _aboutWindow.Closed += (sender, args) =>
+            {
+                _aboutWindow = null;
+            };
+
+            _aboutWindow.Show();
+        });
+    }
+
+    /// <inheritdoc />
+    public void ShowUpToDateDialog(string currentVersion)
+    {
+        Dispatcher.UIThread.Post(() =>
+        {
+            var dialog = new UpdateCheckDialog();
+            dialog.ShowUpToDate(currentVersion);
+            dialog.Show();
+        });
+    }
+
+    /// <inheritdoc />
+    public void ShowUpdateAvailableDialog(string currentVersion, string latestVersion, string releaseUrl)
+    {
+        Dispatcher.UIThread.Post(() =>
+        {
+            var dialog = new UpdateCheckDialog();
+            dialog.ShowUpdateAvailable(currentVersion, latestVersion, releaseUrl);
+            dialog.Show();
+        });
+    }
+
+    /// <inheritdoc />
+    public void ShowUpdateErrorDialog(string errorMessage)
+    {
+        Dispatcher.UIThread.Post(() =>
+        {
+            var dialog = new UpdateCheckDialog();
+            dialog.ShowError(errorMessage);
+            dialog.Show();
+        });
     }
 
     /// <inheritdoc />

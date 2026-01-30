@@ -1,0 +1,84 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="480"
+        x:Class="EchoText.Views.AboutWindow"
+        Title="About EchoText"
+        Width="450" Height="480"
+        WindowStartupLocation="CenterScreen"
+        CanResize="False"
+        Icon="/Assets/Icons/tray-idle.ico">
+
+    <Border Padding="40,30">
+        <StackPanel Spacing="16">
+
+            <!-- App Icon -->
+            <Border HorizontalAlignment="Center"
+                    Background="#1a1a2e"
+                    CornerRadius="16"
+                    Padding="16">
+                <Image Source="/Assets/Icons/tray-idle.ico"
+                       Width="48" Height="48"/>
+            </Border>
+
+            <!-- App Name -->
+            <TextBlock Text="EchoText"
+                       FontSize="32"
+                       FontWeight="Bold"
+                       HorizontalAlignment="Center"/>
+
+            <!-- Version and Tagline -->
+            <StackPanel HorizontalAlignment="Center" Spacing="4">
+                <TextBlock x:Name="VersionText"
+                           FontSize="14"
+                           HorizontalAlignment="Center"
+                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                <TextBlock Text="Your local speech-to-text assistant"
+                           FontSize="13"
+                           HorizontalAlignment="Center"
+                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+            </StackPanel>
+
+            <!-- Description -->
+            <TextBlock TextWrapping="Wrap"
+                       TextAlignment="Center"
+                       FontSize="13"
+                       LineHeight="20"
+                       Margin="0,10,0,0"
+                       Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}"
+                       Text="Convert speech to text using OpenAI's Whisper model running locally on your computer. All processing happens on your device - no data is sent to external servers."/>
+
+            <!-- Tech Stack -->
+            <TextBlock TextWrapping="Wrap"
+                       TextAlignment="Center"
+                       FontSize="12"
+                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                       Text="Built with .NET 8, Avalonia UI, and Whisper.net"/>
+
+            <!-- License -->
+            <StackPanel HorizontalAlignment="Center" Margin="0,10,0,0">
+                <TextBlock TextAlignment="Center"
+                           FontSize="11"
+                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}">
+                    <Run Text="Licensed under the "/>
+                    <Run Text="MIT License" FontWeight="SemiBold"/>
+                </TextBlock>
+                <TextBlock Text="Copyright (c) 2026 EchoText Contributors"
+                           TextAlignment="Center"
+                           FontSize="11"
+                           Foreground="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                           Margin="0,2,0,0"/>
+            </StackPanel>
+
+            <!-- Close Button -->
+            <Button Content="Close"
+                    HorizontalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    Width="120"
+                    Margin="0,10,0,0"
+                    Padding="16,8"
+                    Click="OnCloseClick"/>
+        </StackPanel>
+    </Border>
+</Window>

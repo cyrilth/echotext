@@ -32,6 +32,31 @@ public interface IWindowService
     Task<bool> ShowFirstRunDialogAsync();
 
     /// <summary>
+    /// Shows the about window with version information.
+    /// </summary>
+    void ShowAboutWindow();
+
+    /// <summary>
+    /// Shows the update check dialog with "up to date" message.
+    /// </summary>
+    /// <param name="currentVersion">The current application version</param>
+    void ShowUpToDateDialog(string currentVersion);
+
+    /// <summary>
+    /// Shows the update check dialog with "update available" message.
+    /// </summary>
+    /// <param name="currentVersion">The current application version</param>
+    /// <param name="latestVersion">The latest available version</param>
+    /// <param name="releaseUrl">URL to the release page</param>
+    void ShowUpdateAvailableDialog(string currentVersion, string latestVersion, string releaseUrl);
+
+    /// <summary>
+    /// Shows the update check dialog with an error message.
+    /// </summary>
+    /// <param name="errorMessage">The error message to display</param>
+    void ShowUpdateErrorDialog(string errorMessage);
+
+    /// <summary>
     /// Exits the application gracefully.
     /// </summary>
     void ExitApplication();

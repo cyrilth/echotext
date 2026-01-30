@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- About dialog showing application version and information
+- Toast notifications using Avalonia's notification system (bottom-right corner)
+- Update check dialog showing current version, latest version, and download link
+
+### Fixed
+- Assembly version now matches git tag during release builds
+
 ## [1.0.2] - 2026-01-30
 
 ### Fixed

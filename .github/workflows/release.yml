@@ -102,7 +102,7 @@ jobs:
         run: dotnet restore
 
       - name: Publish Release
-        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -r ${{ matrix.rid }} --self-contained -p:PublishSingleFile=true -p:PublishTrimmed=true -o ./publish/${{ matrix.rid }}
+        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -r ${{ matrix.rid }} --self-contained -p:PublishSingleFile=true -p:PublishTrimmed=true -p:Version=${{ needs.create-release.outputs.version }} -o ./publish/${{ matrix.rid }}
 
       - name: Create archive (Windows)
         if: runner.os == 'Windows'

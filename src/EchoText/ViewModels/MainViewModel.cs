@@ -109,39 +109,23 @@ public partial class MainViewModel : ViewModelBase
     {
         try
         {
-            await _notificationService.ShowNotificationAsync(
-                "Checking for Updates",
-                "Checking GitHub for the latest version...",
-                NotificationType.Info);
-
             var result = await _updateService.CheckForUpdatesAsync();
 
             if (result.UpdateAvailable)
             {
-                // Update available - show notification with action
-                await _notificationService.ShowNotificationAsync(
-                    "Update Available",
-                    $"A new version ({result.LatestVersion}) is available! Click to download.",
-                    NotificationType.Success);
-
-                // Open releases page
-                _updateService.OpenReleasesPage();
+                _windowService.ShowUpdateAvailableDialog(
+                    result.CurrentVersion ?? "Unknown",
+                    result.LatestVersion ?? "Unknown",
+                    result.ReleaseUrl ?? "https://github.com/cyrilth/echotext/releases");
             }
             else
             {
-                // Already up to date
-                await _notificationService.ShowNotificationAsync(
-                    "No Updates",
-                    $"You're running the latest version ({result.CurrentVersion}).",
-                    NotificationType.Info);
+                _windowService.ShowUpToDateDialog(result.CurrentVersion ?? "Unknown");
             }
         }
         catch (Exception ex)
         {
-            await _notificationService.ShowNotificationAsync(
-                "Update Check Failed",
-                $"Failed to check for updates: {ex.Message}",
-                NotificationType.Error);
+            _windowService.ShowUpdateErrorDialog($"Failed to check for updates: {ex.Message}");
         }
     }
 
@@ -151,8 +135,7 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void ShowAbout()
     {
-        // TODO: Implement later
-        // Show about dialog with version info
+        _windowService.ShowAboutWindow();
     }
 
     /// <summary>

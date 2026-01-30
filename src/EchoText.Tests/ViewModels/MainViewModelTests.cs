@@ -211,7 +211,7 @@ public class MainViewModelTests
     }
 
     [Fact]
-    public async Task CheckForUpdates_WithUpdateAvailable_ShouldShowNotificationAndOpenReleases()
+    public async Task CheckForUpdates_WithUpdateAvailable_ShouldShowUpdateAvailableDialog()
     {
         // Arrange
         var viewModel = CreateViewModel();
@@ -223,15 +223,14 @@ public class MainViewModelTests
         await viewModel.CheckForUpdatesCommand.ExecuteAsync(null);
 
         // Assert
-        _mockNotificationService.Verify(x => x.ShowNotificationAsync(
-            "Update Available",
-            It.IsAny<string>(),
-            NotificationType.Success), Times.Once);
-        _mockUpdateService.Verify(x => x.OpenReleasesPage(), Times.Once);
+        _mockWindowService.Verify(x => x.ShowUpdateAvailableDialog(
+            "1.0.0",
+            "1.1.0",
+            "https://github.com/releases"), Times.Once);
     }
 
     [Fact]
-    public async Task CheckForUpdates_WithNoUpdate_ShouldShowUpToDateNotification()
+    public async Task CheckForUpdates_WithNoUpdate_ShouldShowUpToDateDialog()
     {
         // Arrange
         var viewModel = CreateViewModel();
@@ -243,15 +242,11 @@ public class MainViewModelTests
         await viewModel.CheckForUpdatesCommand.ExecuteAsync(null);
 
         // Assert
-        _mockNotificationService.Verify(x => x.ShowNotificationAsync(
-            "No Updates",
-            It.IsAny<string>(),
-            NotificationType.Info), Times.Once);
-        _mockUpdateService.Verify(x => x.OpenReleasesPage(), Times.Never);
+        _mockWindowService.Verify(x => x.ShowUpToDateDialog("1.0.0"), Times.Once);
     }
 
     [Fact]
-    public async Task CheckForUpdates_WithException_ShouldShowErrorNotification()
+    public async Task CheckForUpdates_WithException_ShouldShowErrorDialog()
     {
         // Arrange
         var viewModel = CreateViewModel();
@@ -262,10 +257,8 @@ public class MainViewModelTests
         await viewModel.CheckForUpdatesCommand.ExecuteAsync(null);
 
         // Assert
-        _mockNotificationService.Verify(x => x.ShowNotificationAsync(
-            "Update Check Failed",
-            It.IsAny<string>(),
-            NotificationType.Error), Times.Once);
+        _mockWindowService.Verify(x => x.ShowUpdateErrorDialog(
+            It.Is<string>(s => s.Contains("Network error"))), Times.Once);
     }
 
     [Fact]
