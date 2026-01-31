@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.11] - 2026-01-30
+
+### Fixed
+- Updated README macOS installation instructions to match actual release artifacts (tar.gz, not DMG)
+
 ## [1.0.10] - 2026-01-30
 
 ### Fixed
@@ -105,7 +110,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - No data is sent to external servers
 - Privacy-first architecture
 
-[Unreleased]: https://github.com/cyrilth/echotext/compare/v1.0.10...HEAD
+[Unreleased]: https://github.com/cyrilth/echotext/compare/v1.0.11...HEAD
+[1.0.11]: https://github.com/cyrilth/echotext/compare/v1.0.10...v1.0.11
 [1.0.10]: https://github.com/cyrilth/echotext/compare/v1.0.9...v1.0.10
 [1.0.9]: https://github.com/cyrilth/echotext/compare/v1.0.8...v1.0.9
 [1.0.8]: https://github.com/cyrilth/echotext/compare/v1.0.7...v1.0.8

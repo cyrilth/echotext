@@ -76,11 +76,17 @@ sudo apt install gnome-shell-extension-appindicator
 
 ### macOS (11 Big Sur or later)
 
-1. Download the appropriate DMG for your Mac:
-   - **Intel Macs:** `EchoText-{version}-osx-x64.dmg`
-   - **Apple Silicon (M1/M2/M3):** `EchoText-{version}-osx-arm64.dmg`
-2. Open the DMG file
-3. Drag **EchoText** to your **Applications** folder
+1. Download the appropriate tarball for your Mac:
+   - **Intel Macs:** `EchoText-{version}-osx-x64.tar.gz`
+   - **Apple Silicon (M1/M2/M3):** `EchoText-{version}-osx-arm64.tar.gz`
+2. Extract the tarball:
+   ```bash
+   tar -xzf EchoText-*-osx-*.tar.gz
+   ```
+3. Move to Applications (optional):
+   ```bash
+   mv EchoText /Applications/
+   ```
 4. **First launch only:** Right-click the app > **Open** > Click **Open** in the dialog
    - This is required because the app is not notarized
 5. Grant **Accessibility** permission when prompted:
