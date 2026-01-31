@@ -57,26 +57,10 @@ A privacy-focused, cross-platform speech-to-text application that runs completel
 
 ### Linux (Ubuntu 20.04+)
 
-**Option A: AppImage (Recommended)**
-
-```bash
-# Download the AppImage
-wget https://github.com/cyrilth/echotext/releases/download/v1.0.0/EchoText-1.0.0-linux-x64.AppImage
-
-# Make it executable
-chmod +x EchoText-*.AppImage
-
-# Run it
-./EchoText-*.AppImage
-```
-
-**Option B: Tarball**
-
 ```bash
 # Download and extract
-wget https://github.com/cyrilth/echotext/releases/download/v1.0.0/EchoText-1.0.0-linux-x64.tar.gz
-tar -xzf EchoText-*.tar.gz
-cd EchoText
+wget https://github.com/cyrilth/echotext/releases/latest/download/EchoText-linux-x64.tar.gz
+tar -xzf EchoText-linux-x64.tar.gz
 
 # Run it
 ./EchoText
