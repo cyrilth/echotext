@@ -40,6 +40,20 @@ A privacy-focused, cross-platform speech-to-text application that runs completel
 
 ---
 
+## Platform Support
+
+| Platform | Status |
+|----------|--------|
+| Windows 11 | ✅ Tested |
+| Windows 10 | ⚠️ Untested (binaries provided) |
+| Linux (Ubuntu) | ⚠️ Untested (binaries provided) |
+| macOS (Intel) | ⚠️ Untested (binaries provided) |
+| macOS (Apple Silicon) | ⚠️ Untested (binaries provided) |
+
+> **Note:** This application has only been tested on Windows 11. Binaries are provided for other platforms but are not guaranteed to work. Community feedback and contributions for other platforms are welcome!
+
+---
+
 ## Installation
 
 ### Windows
