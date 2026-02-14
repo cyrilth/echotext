@@ -6,7 +6,7 @@ A privacy-focused, cross-platform speech-to-text application that runs completel
 
 ![EchoText Demo](docs/images/demo.gif)
 
-[![Build Status](https://github.com/cyrilth/echotext/workflows/Build/badge.svg)](https://github.com/cyrilth/echo-text/actions/workflows/release.yml)
+[![Build Status](https://github.com/cyrilth/echotext/workflows/Build%20and%20Test/badge.svg)](https://github.com/cyrilth/echotext/actions/workflows/build.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Latest Release](https://img.shields.io/github/v/release/cyrilth/echotext)](https://github.com/cyrilth/echotext/releases)
 
